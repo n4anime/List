@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>قائمة الأنمي - 02</title>
+
+  <!-- خطوط وأيقونات -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- مكتبات مساعدة -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+  <!-- Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    .count {
+      background: #0000001c;
+      color: #676767;
+      padding: 0px 0px;
+      border-radius: 50%;
+      font-size: 11px;
+      display: inline-flex;
+      min-width: 15px;
+      min-height: 15px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    * {
+      font-family: 'Baloo Bhaijaan 2', sans-serif;
+      box-sizing: border-box;
+    }
+
+    .fa, .fas, .far, .fal, .fab {
+      font-family: "Font Awesome 6 Free" !important;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #FFE666;
+      direction: rtl;
+    }
+
+    /* شريط أعلى الصفحة */
+    #top-bar {
+      background-color: #9bbbb2;
+      border-radius: 0;
+      border: 1px solid #000;
+      box-shadow: 2px 2px 0 #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 15px 10px 5px;
+    }
+    #logo-box {
+      flex: 0 0 auto;
+    }
+    #site-logo {
+      max-height: 70px;
+      width: auto;
+      display: block;
+    }
+    #top-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #search-container {
+      text-align: center;
+      margin: 5px 0;
+    }
+    #searchBox {
+      box-shadow: 2px 2px 0 #000;
+      background-color: #FFF7D1;
+      border-radius: 0;
+      border: 1px solid #000;
+      padding: 6px 5px;
+      font-size: 14px;
+      width: 150px;
+      max-width: 70vw;
+    }
+    #searchBox:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    #favoritesToggle,
+    #loginSyncBtn,
+    #topLikesFilterBtn {
+      margin: 0;
+      padding: 6px 10px;
+      border-radius: 0;
+      border: 1px solid #000;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #000;
+      font-family: 'Baloo Bhaijaan 2', cursive;
+      font-size: 13px;
+      background-color: #FFF7D1;
+      color: #111;
+    }
+    #favoritesToggle {
+      background-color: #FFEE58;
+    }
+    #loginSyncBtn {
+      background-color: #FFFFFF;
+    }
+    #topLikesFilterBtn {
+      background-color: #FFD4D4;
+    }
+    #topLikesFilterBtn.active-toplikes {
+      background-color: #FF6B6B;
+      color: #fff;
+      font-weight: bold;
+    }
+    #favoritesToggle:hover,
+    #loginSyncBtn:hover,
+    #topLikesFilterBtn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    /* الفلاتر */
+    #filter-settings {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .dropdown-check-list {
+      display: inline-flex;
+      margin: 3px;
+      position: relative;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      align-items: center;
+      width: 170px;
+    }
+
+    .dropdown-check-list .anchor {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      padding: 10px 30px 10px 15px;
+      border: 1px solid #000;
+      width: 100%;
+      text-align: center;
+      background-color: #FFF7D1;
+      box-shadow: 2px 2px 0 #000;
+    }
+    .dropdown-check-list .anchor:after {
+      position: absolute;
+      content: "";
+      border-left: 2px solid black;
+      border-top: 2px solid black;
+      padding: 5px;
+      right: 10px;
+      top: 20%;
+      transform: rotate(-135deg);
+    }
+    .dropdown-check-list.visible .anchor {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .dropdown-check-list ul.items {
+      padding: 1px;
+      display: none;
+      margin: 0;
+      border: 1px solid #000;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      background: #fff;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 2px 2px 0 #000;
+    }
+    .dropdown-check-list.visible .items {
+      display: block;
+    }
+
+    .dropdown-check-list ul.items li {
+      list-style: none;
+      padding: 3px;
+    }
+    .dropdown-check-list ul.items li label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background-color: #FFFFFF;
+      border-radius: 0;
+      border: 1px solid #000;
+      padding: 2px 5px;
+      box-shadow: 2px 2px 0 #000;
+      line-height: 1.5;
+    }
+    .dropdown-check-list ul.items li label:hover {
+      background-color: #FFF0B3;
+    }
+    .dropdown-check-list ul.items li input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+    .dropdown-check-list ul.items li label .option-text {
+      background: transparent;
+      padding: 0;
+    }
+
+    #list-Episode .anchor {
+      background-color: #d0eaff;
+      color: #007acc;
+    }
+    #list-Source .anchor {
+      background-color: #d0f5d0;
+      color: #2e8b57;
+    }
+    #list-Studio .anchor {
+      background-color: #ffe5cc;
+      color: #ff8c00;
+    }
+    #list-Aired .anchor {
+      background-color: #e6d0ff;
+      color: #800080;
+    }
+    #list-Genre .anchor {
+      background-color: #ffd0e8;
+      color: #c2185b;
+    }
+    #list-Theme .anchor {
+      background-color: #d0fff8;
+      color: #00897b;
+    }
+
+    @media (max-width: 1000px) {
+      .dropdown-check-list {
+        width: 45%;
+      }
+      .dropdown-check-list .anchor {
+        width: 90%;
+      }
+    }
+
+    /* الكروت */
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+    }
+    .card-wrapper {
+      width: 250px;
+      margin: 5px;
+      position: relative;
+    }
+    .top-like-rank {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      padding: 2px 6px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+    }
+    .anime-card {
+      width: 250px;
+      min-height: 350px;
+      height: 350px;
+      position: relative;
+      color: #fff;
+      overflow: hidden;
+      box-shadow: 0px 30px 0px 0px rgb(0 0 0);
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+    .shadow-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to bottom, rgb(0 0 0), transparent);
+      z-index: 2;
+    }
+    .shadow-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, rgb(0 0 0), transparent);
+      z-index: 2;
+    }
+    .card-header-logo,
+    .card-footer-logo,
+    .card-top-bar,
+    .card-content,
+    .story-box,
+    .card-buttons {
+      position: relative;
+      z-index: 3;
+    }
+    .card-header-logo,
+    .card-footer-logo {
+      text-align: center;
+      padding: 4px 1px;
+    }
+    .card-header-logo img,
+    .card-footer-logo img {
+      max-width: 35%;
+      padding: 2px 1px;
+      height: auto;
+    }
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 4px;
+    }
+    .anime-title {
+      background: rgba(0,0,0,0.4);
+      padding: 2px 4px;
+      border-radius: 5px;
+      font-size: 13.1px;
+      flex: 1;
+      margin: 0 4px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: bold;
+    }
+    .rating-area {
+      display: flex;
+      align-items: center;
+      background: rgb(0 128 255 / 38%);
+      padding: 2px 4px;
+      border-radius: 5px;
+      font-size: 13.1px;
+      gap: 4px;
+    }
+    .rating-area img {
+      width: 25px;
+    }
+    .card-content {
+      display: flex;
+      flex-direction: row;
+      padding: 3px;
+      gap: 2px;
+      font-size: 13.1px;
+    }
+    .poster-div {
+      width: 56px;
+      height: 83px;
+      border-radius: 5px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 5px;
+    }
+    .info-boxes {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .info-row {
+      display: flex;
+      gap: 2px;
+    }
+    .info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+    }
+    .info-box {
+      background: rgba(0,0,0,0.4);
+      padding: 2px 4px;
+      border-radius: 5px;
+      font-size: 13.1px;
+      line-height: 1.2;
+      flex: 1;
+      text-align: center;
+    }
+    .info-box strong,
+    .info-box-genre strong {
+      margin-left: 2px;
+      font-weight: bold;
+      color: #fffae0;
+      font-size: 8px;
+    }
+    .info-box span {
+      font-size: 12px;
+    }
+    .info-box-genre {
+      background: rgba(0,0,0,0.4);
+      padding: 2px 4px;
+      border-radius: 5px;
+      font-size: 13.1px;
+      line-height: 1.2;
+      flex: 1;
+      text-align: center;
+    }
+    .story-box {
+      background: rgba(0,0,0,0.5);
+      margin: 2px;
+      padding: 1px;
+      border-radius: 5px;
+      font-size: 13.1px;
+      line-height: 1.3;
+    }
+
+    /* أزرار الكرت */
+    .card-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 4px;
+    }
+    .card-buttons button {
+      background-color: #FFFFFF;
+      border: 1px solid #000;
+      color: #111;
+      padding: 3px 4px;
+      border-radius: 0;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 400;
+      box-shadow: 2px 2px 0 #000;
+    }
+    .favorite-btn.active {
+      background: gold;
+      color: #000;
+    }
+    .share-btn.active-share {
+      background-color: #cce9ff;
+      color: #000;
+    }
+    .download-btn.active-download {
+      background-color: #d5ffd5;
+      color: #000;
+    }
+
+    /* الترقيم */
+    #pagination,
+    #pagination-bottom {
+      text-align: center;
+      margin: 10px 0;
+    }
+    #pagination button,
+    #pagination-bottom button {
+      margin: 5px;
+      padding: 3px 11px;
+      border-radius: 0;
+      border: 1px solid #000;
+      cursor: pointer;
+      background-color: #FFF7D1;
+      box-shadow: 2px 2px 0 #000;
+      font-family: 'Baloo Bhaijaan 2', cursive;
+    }
+    #pagination button.active-page,
+    #pagination-bottom button.active-page {
+      background-color: #0088cc;
+      color: #fff;
+      font-weight: bold;
+    }
+    #pagination button:hover,
+    #pagination-bottom button:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    /* لودر بسيط */
+    #loader {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #111;
+      font-weight: 600;
+    }
+    #progressContainer {
+      width: 80%;
+      max-width: 400px;
+      height: 20px;
+      background: #FFF;
+      border-radius: 16px;
+      border: 3px solid #000;
+      margin: 10px auto;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: #FFB74D;
+      transition: width 0.4s;
+    }
+
+    #data-container {
+      text-align: center;
+      margin-top: 15px;
+      display: none;
+    }
+
+    /* زر رجوع لأعلى */
+    #backToTop {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid #000;
+      background-color: #FFF7D1;
+      box-shadow: 2px 2px 0 #000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+    }
+    #backToTop i {
+      pointer-events: none;
+    }
+    #backToTop:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div id="top-bar">
+      <div id="logo-box">
+        <img id="site-logo" src="https://i.suar.me/OzJaa/l" alt="شعار الموقع">
+      </div>
+      <div id="top-controls">
+        <div id="search-container">
+          <input type="text" id="searchBox" placeholder="ابحث هنا..." />
+        </div>
+        <button id="favoritesToggle"><i class="fas fa-bookmark"></i> اظهار المفضلات (0)</button>
+        <button id="loginSyncBtn">سجّل لحفظ مفضلتك <span class="fa-brands fa-google"></span></button>
+        <button id="topLikesFilterBtn"><i class="fa-solid fa-fire"></i> أفضل اللايكات</button>
+      </div>
+    </div>
+
+    <!-- الفلاتر -->
+    <div id="filter-settings">
+      <div id="list-Episode" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-list-ol"></i> فلتر الحلقات</span>
+        <ul class="items"></ul>
+      </div>
+      <div id="list-Source" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-book-open"></i> فلتر الاقتباس</span>
+        <ul class="items"></ul>
+      </div>
+      <div id="list-Studio" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-clapperboard"></i> فلتر الاستوديو</span>
+        <ul class="items"></ul>
+      </div>
+      <div id="list-Aired" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-calendar-days"></i> تاريخ العرض</span>
+        <ul class="items"></ul>
+      </div>
+      <div id="list-Genre" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-tags"></i> تصنيفات</span>
+        <ul class="items"></ul>
+      </div>
+      <div id="list-Theme" class="dropdown-check-list" tabindex="100">
+        <span class="anchor"><i class="fa-solid fa-mask"></i> ثيم</span>
+        <ul class="items"></ul>
+      </div>
+    </div>
+
+    <div id="pagination"></div>
+
+    <div id="loader">
+      <div id="progressContainer">
+        <div id="progressBar"></div>
+      </div>
+      <div id="progressText">جارٍ تجهيز القائمة...</div>
+    </div>
+  </header>
+
+  <div id="data-container"></div>
+  <div id="pagination-bottom"></div>
+
+  <button id="backToTop" title="أعلى الصفحة"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script>
+    // إعداد Firebase (نفس مفاتيح مدونتك)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbYZ7Zk7Aoi7ePeSx2MM0t-T9vDFXtxxo",
+      authDomain: "allanimefir.firebaseapp.com",
+      projectId: "allanimefir",
+      storageBucket: "allanimefir.firebasestorage.app",
+      messagingSenderId: "45617829708",
+      appId: "1:45617829708:web:12b65ad79e49531754a1e9"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    let auth = null;
+    let db = null;
+    let favoritesCollection = null;
+    let likesCollection = null;
+    let currentUser = null;
+
+    try {
+      auth = firebase.auth();
+      db = firebase.firestore();
+      favoritesCollection = db.collection("favorites");
+      likesCollection = db.collection("likes");
+    } catch (e) {
+      console.error("Firebase init error:", e);
+    }
+
+    // بيانات الأنمي (تقدر تزودها براحتك)
+    const allAnimeData = [
+      {
+        Numb: "1",
+        Cover: "https://cdn.myanimelist.net/images/anime/1520/147248l.jpg",
+        Title: "Little Witch Academia (TV)",
+        Rating: "7.8",
+        Episode: "25",
+        Aired: "2017",
+        Source: "اصلي",
+        Studio: "Trigger",
+        Genre: "مغامرات, كوميديا, فانتازيا",
+        Theme: "مدرسي",
+        Story: "أكّو كاغاري فتاة عادية تحلم بأن تصبح ساحرة مثل بطلتها شايني شاريـوت. تلتحق بأكاديمية لونا نوفا رغم ضعفها في السحر، ترافقها لوتّي وسوسي، وتجد عصا شاريـوت لتبدأ مغامراتها في عالم يتراجع فيه السحر."
+      },
+      {
+        Numb: "2",
+        Cover: "https://cdn.myanimelist.net/images/anime/11/54319l.jpg",
+        Title: "Samurai Flamenco",
+        Rating: "6.88",
+        Episode: "22",
+        Aired: "2013",
+        Source: "اصلي",
+        Studio: "Manglobe",
+        Genre: "أكشن, كوميديا",
+        Theme: "بالغين, محاكاة ساخرة, قوة خارقة",
+        Story: "ماسايوشي هازاما عارض أزياء يعيش حلم الأبطال الخارقين باسم ساموراي فلامينكو. يناضل ضد المخالفات البسيطة حتى الجرائم الكبرى، ينكشف سره أمام الشرطي غوتو، وتتصاعد الأحداث لتطال مصير العالم كله."
+      }
+    ];
+
+    // حالات عامة
+    let favorites = new Set();
+    let sharedCards = new Set();
+    let downloadedCards = new Set();
+    const LOCAL_FAV_KEY = "animeFavorites";
+    const LOCAL_LIKES_KEY = "animeLikesLocal";
+    let localLikes = null;
+
+    let activeFilters = {
+      Episode: [],
+      Source: [],
+      Studio: [],
+      Aired: [],
+      Genre: [],
+      Theme: []
+    };
+
+    const pageSize = 50;
+    let currentPage = 1;
+    let showFavoritesOnly = false;
+    let topLikesMode = false;
+    let topLikesList = [];
+
+    function loadLocalLikes() {
+      if (localLikes !== null) return;
+      try {
+        const stored = localStorage.getItem(LOCAL_LIKES_KEY);
+        localLikes = stored ? JSON.parse(stored) : {};
+      } catch (e) {
+        localLikes = {};
+      }
+    }
+    function saveLocalLikes() {
+      if (!localLikes) return;
+      try {
+        localStorage.setItem(LOCAL_LIKES_KEY, JSON.stringify(localLikes));
+      } catch (e) {}
+    }
+
+    function loadFavoritesLocal() {
+      try {
+        const stored = localStorage.getItem(LOCAL_FAV_KEY);
+        favorites = stored ? new Set(JSON.parse(stored)) : new Set();
+      } catch (e) {
+        favorites = new Set();
+      }
+    }
+    function saveFavoritesLocal() {
+      try {
+        localStorage.setItem(LOCAL_FAV_KEY, JSON.stringify(Array.from(favorites)));
+      } catch (e) {}
+    }
+
+    function saveFavoritesToServer() {
+      if (!favoritesCollection || !currentUser) return;
+      const arr = Array.from(favorites);
+      favoritesCollection.doc(currentUser.uid).set({ items: arr }, { merge: true }).catch(console.error);
+    }
+
+    function mergeFavoritesWithServer() {
+      if (!favoritesCollection || !currentUser) {
+        loadFavoritesLocal();
+        updateFavoritesCount();
+        renderCardsWithFilters(isShowingFavoritesOnly());
+        return;
+      }
+      let localArr = [];
+      try {
+        const stored = localStorage.getItem(LOCAL_FAV_KEY);
+        localArr = stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        localArr = [];
+      }
+      favoritesCollection.doc(currentUser.uid).get().then(doc => {
+        const union = new Set(localArr);
+        if (doc.exists && Array.isArray(doc.data().items)) {
+          doc.data().items.forEach(x => union.add(x));
+        }
+        favorites = union;
+        saveFavoritesLocal();
+        saveFavoritesToServer();
+        updateFavoritesCount();
+        renderCardsWithFilters(isShowingFavoritesOnly());
+      }).catch(err => {
+        console.error("mergeFavoritesWithServer error:", err);
+        loadFavoritesLocal();
+        updateFavoritesCount();
+        renderCardsWithFilters(isShowingFavoritesOnly());
+      });
+    }
+
+    function updateFavoritesCount() {
+      const btn = document.getElementById("favoritesToggle");
+      if (!btn) return;
+      const label = showFavoritesOnly ? "اظهار الكل" : "اظهار المفضلات";
+      btn.innerHTML = '<i class="fas fa-bookmark"></i> ' + label + " (" + favorites.size + ")";
+    }
+
+    function isShowingFavoritesOnly() {
+      return showFavoritesOnly;
+    }
+
+    function matchesSearch(anime, query) {
+      if (!query) return true;
+      for (let key in anime) {
+        if (anime[key] && anime[key].toString().toLowerCase().includes(query)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function getUniqueId(anime, index) {
+      if (anime.Numb) return "wrapper-" + anime.Numb;
+      return "wrapper-" + (index + 1);
+    }
+
+    function getFilteredAnime(showFavOnly) {
+      const searchBox = document.getElementById("searchBox");
+      const searchQuery = searchBox ? searchBox.value.trim().toLowerCase() : "";
+      const result = [];
+
+      allAnimeData.forEach((anime, index) => {
+        const uniqueId = getUniqueId(anime, index);
+        if (showFavOnly && !favorites.has(uniqueId)) return;
+        if (!matchesSearch(anime, searchQuery)) return;
+
+        let pass = true;
+        for (let key in activeFilters) {
+          const selected = activeFilters[key];
+          if (!selected || selected.length === 0) continue;
+
+          let animeValues = [];
+          if (key === "Genre" || key === "Theme") {
+            const raw = anime[key] || "";
+            animeValues = raw.split(",").map(v => v.trim()).filter(Boolean);
+          } else {
+            animeValues = [anime[key] || "-"];
+          }
+          const ok = animeValues.some(v => selected.includes(v));
+          if (!ok) {
+            pass = false;
+            break;
+          }
+        }
+        if (!pass) return;
+        result.push({ anime, uniqueId });
+      });
+
+      if (topLikesMode && topLikesList.length > 0) {
+        result.sort((a, b) => {
+          const ia = topLikesList.indexOf(a.uniqueId);
+          const ib = topLikesList.indexOf(b.uniqueId);
+          const pa = ia === -1 ? 99999 : ia;
+          const pb = ib === -1 ? 99999 : ib;
+          return pa - pb;
+        });
+        return result.slice(0, 20);
+      }
+
+      return result;
+    }
+
+    function renderPagination(totalItems) {
+      const topPag = document.getElementById("pagination");
+      const bottomPag = document.getElementById("pagination-bottom");
+      if (topPag) topPag.innerHTML = "";
+      if (bottomPag) bottomPag.innerHTML = "";
+
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+      if (totalPages <= 1) return;
+
+      function makeBtn(page) {
+        const btn = document.createElement("button");
+        btn.textContent = page;
+        btn.className = "page-btn";
+        if (page === currentPage) btn.classList.add("active-page");
+        btn.addEventListener("click", () => {
+          currentPage = page;
+          renderCardsWithFilters(isShowingFavoritesOnly());
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        return btn;
+      }
+
+      for (let i = 1; i <= totalPages; i++) {
+        const bt = makeBtn(i);
+        const bb = makeBtn(i);
+        if (topPag) topPag.appendChild(bt);
+        if (bottomPag) bottomPag.appendChild(bb);
+      }
+    }
+
+    function loadTopLikesList(callback) {
+      if (!likesCollection) {
+        callback([]);
+        return;
+      }
+      likesCollection.orderBy("count", "desc").limit(50).get()
+        .then(snap => {
+          const arr = [];
+          snap.forEach(doc => arr.push(doc.id));
+          callback(arr);
+        })
+        .catch(err => {
+          console.error("loadTopLikesList error:", err);
+          callback([]);
+        });
+    }
+
+    function toggleTopLikesMode() {
+      const btn = document.getElementById("topLikesFilterBtn");
+      if (!btn) return;
+
+      if (topLikesMode) {
+        topLikesMode = false;
+        topLikesList = [];
+        btn.classList.remove("active-toplikes");
+        currentPage = 1;
+        renderCardsWithFilters(isShowingFavoritesOnly());
+        return;
+      }
+
+      loadTopLikesList(list => {
+        topLikesList = list;
+        topLikesMode = true;
+        btn.classList.add("active-toplikes");
+        currentPage = 1;
+        renderCardsWithFilters(isShowingFavoritesOnly());
+      });
+    }
+
+    function populateCustomDropdown(filterType) {
+      const container = document.getElementById("list-" + filterType);
+      if (!container) return;
+      const ul = container.querySelector(".items");
+      if (!ul) return;
+      ul.innerHTML = "";
+
+      const liAll = document.createElement("li");
+      const checkboxAll = document.createElement("input");
+      checkboxAll.type = "checkbox";
+      checkboxAll.value = "all";
+      checkboxAll.checked = (activeFilters[filterType].length === 0);
+      checkboxAll.addEventListener("change", function () {
+        if (this.checked) {
+          activeFilters[filterType] = [];
+          ul.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+            if (chk.value !== "all") chk.checked = false;
+          });
+          currentPage = 1;
+          renderCardsWithFilters(isShowingFavoritesOnly());
+        }
+      });
+      const labelAll = document.createElement("label");
+      labelAll.appendChild(checkboxAll);
+      const spanAll = document.createElement("span");
+      spanAll.className = "option-text";
+      spanAll.textContent = " اظهار الكل";
+      labelAll.appendChild(spanAll);
+      liAll.appendChild(labelAll);
+      ul.appendChild(liAll);
+
+      let distinctValues = [];
+      let counts = {};
+      const showFav = isShowingFavoritesOnly();
+
+      allAnimeData.forEach((anime, index) => {
+        const uniqueId = getUniqueId(anime, index);
+        if (showFav && !favorites.has(uniqueId)) return;
+
+        if (filterType === "Genre" || filterType === "Theme") {
+          const raw = anime[filterType] || "";
+          if (!raw) return;
+          const parts = raw.split(",").map(v => v.trim()).filter(Boolean);
+          const uniq = [...new Set(parts)];
+          uniq.forEach(val => {
+            if (!distinctValues.includes(val)) distinctValues.push(val);
+            counts[val] = (counts[val] || 0) + 1;
+          });
+        } else {
+          const value = anime[filterType] || "-";
+          if (!distinctValues.includes(value)) distinctValues.push(value);
+          counts[value] = (counts[value] || 0) + 1;
+        }
+      });
+
+      if (filterType === "Episode" || filterType === "Aired") {
+        distinctValues.sort((a, b) => {
+          const na = parseFloat(a);
+          const nb = parseFloat(b);
+          if (!isNaN(na) && !isNaN(nb)) return nb - na;
+          return a.toString().localeCompare(b.toString(), "ar");
+        });
+      } else {
+        distinctValues.sort((a, b) => a.toString().localeCompare(b.toString(), "ar"));
+      }
+
+      distinctValues.forEach(val => {
+        const li = document.createElement("li");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = val;
+        if (activeFilters[filterType].includes(val)) checkbox.checked = true;
+        checkbox.addEventListener("change", function () {
+          const allChk = ul.querySelector('input[value="all"]');
+          if (this.checked && allChk) allChk.checked = false;
+          updateActiveFilter(filterType, ul);
+        });
+        const label = document.createElement("label");
+        label.appendChild(checkbox);
+        const spanOpt = document.createElement("span");
+        spanOpt.className = "option-text";
+        spanOpt.innerHTML = " " + val + ' <span class="count">' + (counts[val] || 0) + "</span>";
+        label.appendChild(spanOpt);
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+    }
+
+    function updateActiveFilter(filterType, ul) {
+      const checkboxes = ul.querySelectorAll('input[type="checkbox"]');
+      activeFilters[filterType] = [];
+      checkboxes.forEach(chk => {
+        if (chk.value !== "all" && chk.checked) {
+          activeFilters[filterType].push(chk.value);
+        }
+      });
+      if (activeFilters[filterType].length === 0) {
+        const allChk = ul.querySelector('input[value="all"]');
+        if (allChk) allChk.checked = true;
+      }
+      currentPage = 1;
+      renderCardsWithFilters(isShowingFavoritesOnly());
+    }
+
+    function setupCustomDropdown(filterType) {
+      const container = document.getElementById("list-" + filterType);
+      if (!container) return;
+      const anchor = container.querySelector(".anchor");
+      if (!anchor) return;
+      anchor.onclick = function () {
+        const all = document.querySelectorAll(".dropdown-check-list");
+        all.forEach(d => { if (d !== container) d.classList.remove("visible"); });
+        container.classList.toggle("visible");
+      };
+    }
+
+    function createCardWrapper(uniqueId, anime, index) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "card-wrapper";
+      wrapper.id = uniqueId;
+      if (favorites.has(uniqueId)) wrapper.classList.add("favorite");
+
+      const card = document.createElement("div");
+      card.className = "anime-card";
+      card.id = "card-" + uniqueId;
+
+      const cardBg = document.createElement("div");
+      cardBg.className = "card-bg";
+      cardBg.style.backgroundImage = "url(" + (anime.Cover || "") + ")";
+      card.appendChild(cardBg);
+
+      const overlay = document.createElement("div");
+      overlay.className = "overlay";
+      card.appendChild(overlay);
+
+      const shadowTop = document.createElement("div");
+      shadowTop.className = "shadow-top";
+      card.appendChild(shadowTop);
+
+      const shadowBottom = document.createElement("div");
+      shadowBottom.className = "shadow-bottom";
+      card.appendChild(shadowBottom);
+
+      const topLogoDiv = document.createElement("div");
+      topLogoDiv.className = "card-header-logo";
+      const topLogoImg = document.createElement("img");
+      topLogoImg.src = "https://i.suar.me/OzJaa/l";
+      topLogoImg.alt = "Top Logo";
+      topLogoImg.crossOrigin = "anonymous";
+      topLogoDiv.appendChild(topLogoImg);
+      card.appendChild(topLogoDiv);
+
+      const topBar = document.createElement("div");
+      topBar.className = "card-top-bar";
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "anime-title";
+      titleDiv.textContent = anime.Title || "عنوان غير متوفر";
+
+      const ratingDiv = document.createElement("div");
+      ratingDiv.className = "rating-area";
+      const ratingIcon = document.createElement("img");
+      ratingIcon.src = "https://i.suar.me/8GKKn/l";
+      ratingIcon.alt = "Rating Icon";
+      ratingIcon.crossOrigin = "anonymous";
+      const ratingText = document.createElement("span");
+      ratingText.textContent = anime.Rating ? " " + anime.Rating : "MAL -";
+      ratingDiv.appendChild(ratingIcon);
+      ratingDiv.appendChild(ratingText);
+
+      topBar.appendChild(titleDiv);
+      topBar.appendChild(ratingDiv);
+      card.appendChild(topBar);
+
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "card-content";
+
+      const posterDiv = document.createElement("div");
+      posterDiv.className = "poster-div";
+      const posterImg = document.createElement("img");
+      posterImg.className = "poster-img";
+      posterImg.src = anime.Cover || "";
+      posterImg.alt = "Anime Cover";
+      posterImg.crossOrigin = "anonymous";
+      posterDiv.appendChild(posterImg);
+      contentDiv.appendChild(posterDiv);
+
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "info-boxes";
+
+      const row1 = document.createElement("div");
+      row1.className = "info-row";
+      const epBox = document.createElement("div");
+      epBox.className = "info-box";
+      epBox.innerHTML = "<strong>حلقات:</strong> <span>" + (anime.Episode || "-") + "</span>";
+      const airedBox = document.createElement("div");
+      airedBox.className = "info-box";
+      airedBox.innerHTML = "<strong>تاريخ:</strong> <span>" + (anime.Aired || "-") + "</span>";
+      row1.appendChild(epBox);
+      row1.appendChild(airedBox);
+
+      const row2 = document.createElement("div");
+      row2.className = "info-row";
+      const sourceBox = document.createElement("div");
+      sourceBox.className = "info-box";
+      sourceBox.innerHTML = "<strong>اقتباس:</strong> <span>" + (anime.Source || "-") + "</span>";
+      const studioBox = document.createElement("div");
+      studioBox.className = "info-box";
+      studioBox.innerHTML = "<strong>استديو:</strong> <span>" + (anime.Studio || "-") + "</span>";
+      row2.appendChild(sourceBox);
+      row2.appendChild(studioBox);
+
+      const row3 = document.createElement("div");
+      row3.className = "info-row";
+      const infoColumn = document.createElement("div");
+      infoColumn.className = "info-column";
+      const genreBox = document.createElement("div");
+      genreBox.className = "info-box-genre";
+      genreBox.innerHTML = "<strong>تصنيف:</strong> " + (anime.Genre || "-");
+      const themeBox = document.createElement("div");
+      themeBox.className = "info-box-genre";
+      themeBox.innerHTML = "<strong>ثيم:</strong> " + (anime.Theme || "-");
+      infoColumn.appendChild(genreBox);
+      infoColumn.appendChild(themeBox);
+      row3.appendChild(infoColumn);
+
+      infoDiv.appendChild(row1);
+      infoDiv.appendChild(row2);
+      infoDiv.appendChild(row3);
+
+      contentDiv.appendChild(infoDiv);
+      card.appendChild(contentDiv);
+
+      const storyDiv = document.createElement("div");
+      storyDiv.className = "story-box";
+      storyDiv.textContent = anime.Story || "";
+      card.appendChild(storyDiv);
+
+      const bottomLogoDiv = document.createElement("div");
+      bottomLogoDiv.className = "card-footer-logo";
+      const bottomLogoImg = document.createElement("img");
+      bottomLogoImg.src = "https://i.suar.me/evdMd/l";
+      bottomLogoImg.alt = "Bottom Logo";
+      bottomLogoImg.crossOrigin = "anonymous";
+      bottomLogoDiv.appendChild(bottomLogoImg);
+      card.appendChild(bottomLogoDiv);
+
+      if (topLikesMode && Array.isArray(topLikesList) && topLikesList.length) {
+        const rankIndex = topLikesList.indexOf(uniqueId);
+        if (rankIndex !== -1) {
+          const rankBadge = document.createElement("div");
+          rankBadge.className = "top-like-rank";
+          rankBadge.textContent = (rankIndex + 1).toString();
+          card.appendChild(rankBadge);
+        }
+      }
+
+      const buttonsDiv = createCardButtons(uniqueId, card.id);
+      wrapper.appendChild(card);
+      wrapper.appendChild(buttonsDiv);
+
+      return wrapper;
+    }
+
+    function setupLikeState(uniqueId, likeButton) {
+      const likeIcon = likeButton.querySelector(".like-icon");
+      const likeCountSpan = likeButton.querySelector(".like-count");
+      loadLocalLikes();
+      let baseCount = 0;
+      let userHasLiked = false;
+
+      if (likesCollection) {
+        const likeDocRef = likesCollection.doc(uniqueId);
+        likeDocRef.get().then(doc => {
+          if (doc.exists) {
+            const data = doc.data() || {};
+            baseCount = typeof data.count === "number" ? data.count : 0;
+            if (currentUser && data.users && data.users[currentUser.uid]) {
+              userHasLiked = true;
+              likeIcon.style.color = "red";
+            }
+          }
+          if (!currentUser && localLikes && localLikes[uniqueId]) {
+            userHasLiked = true;
+            baseCount += 1;
+            likeIcon.style.color = "red";
+          }
+          likeButton.dataset.baseCount = baseCount;
+          likeButton.dataset.userHasLiked = userHasLiked ? "1" : "0";
+          likeCountSpan.textContent = baseCount;
+        }).catch(() => {
+          const localFlag = localLikes && localLikes[uniqueId];
+          likeButton.dataset.baseCount = localFlag ? 1 : 0;
+          likeButton.dataset.userHasLiked = localFlag ? "1" : "0";
+          likeCountSpan.textContent = localFlag ? 1 : 0;
+          if (localFlag) likeIcon.style.color = "red";
+        });
+
+        likeButton.addEventListener("click", () => {
+          const likeDocRef = likesCollection.doc(uniqueId);
+          const already = likeButton.dataset.userHasLiked === "1";
+
+          if (currentUser) {
+            likeDocRef.get().then(doc => {
+              let count = 0;
+              let users = {};
+              if (doc.exists) {
+                const data = doc.data() || {};
+                count = data.count || 0;
+                users = data.users || {};
+              }
+              if (already) {
+                if (users[currentUser.uid]) {
+                  delete users[currentUser.uid];
+                  count = Math.max(0, count - 1);
+                }
+                likeIcon.style.color = "#000";
+                likeButton.dataset.userHasLiked = "0";
+              } else {
+                if (!users[currentUser.uid]) {
+                  users[currentUser.uid] = true;
+                  count = count + 1;
+                }
+                likeIcon.style.color = "red";
+                likeButton.dataset.userHasLiked = "1";
+              }
+              likeDocRef.set({ count, users }, { merge: true }).then(() => {
+                likeButton.dataset.baseCount = String(count);
+                likeCountSpan.textContent = count;
+                loadLocalLikes();
+                if (localLikes && localLikes[uniqueId]) {
+                  delete localLikes[uniqueId];
+                  saveLocalLikes();
+                }
+              });
+            });
+          } else {
+            loadLocalLikes();
+            if (!localLikes) localLikes = {};
+            let base = parseInt(likeButton.dataset.baseCount || "0", 10);
+            if (already) {
+              delete localLikes[uniqueId];
+              likeIcon.style.color = "#000";
+              likeButton.dataset.userHasLiked = "0";
+              likeCountSpan.textContent = base;
+            } else {
+              localLikes[uniqueId] = true;
+              likeIcon.style.color = "red";
+              likeButton.dataset.userHasLiked = "1";
+              likeCountSpan.textContent = base + 1;
+            }
+            saveLocalLikes();
+          }
+        });
+      } else {
+        const flag = localLikes && localLikes[uniqueId];
+        likeButton.dataset.userHasLiked = flag ? "1" : "0";
+        likeButton.dataset.baseCount = flag ? "1" : "0";
+        likeCountSpan.textContent = flag ? "1" : "0";
+        if (flag) likeIcon.style.color = "red";
+
+        likeButton.addEventListener("click", () => {
+          loadLocalLikes();
+          if (!localLikes) localLikes = {};
+          const already = likeButton.dataset.userHasLiked === "1";
+          if (already) {
+            delete localLikes[uniqueId];
+            likeIcon.style.color = "#000";
+            likeButton.dataset.userHasLiked = "0";
+            likeCountSpan.textContent = "0";
+          } else {
+            localLikes[uniqueId] = true;
+            likeIcon.style.color = "red";
+            likeButton.dataset.userHasLiked = "1";
+            likeCountSpan.textContent = "1";
+          }
+          saveLocalLikes();
+        });
+      }
+    }
+
+    function createCardButtons(uniqueId, cardId) {
+      const buttonsDiv = document.createElement("div");
+      buttonsDiv.className = "card-buttons";
+
+      const favButton = document.createElement("button");
+      favButton.innerHTML = '<i class="fas fa-bookmark"></i> اضافة الى المفضلة';
+      favButton.className = "favorite-btn";
+      if (favorites.has(uniqueId)) favButton.classList.add("active");
+      favButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggleFavorite(uniqueId, favButton);
+      });
+
+      const shareButton = document.createElement("button");
+      shareButton.innerHTML = '<i class="fas fa-share-alt"></i> مشاركة';
+      shareButton.className = "share-btn";
+      if (sharedCards.has(uniqueId)) shareButton.classList.add("active-share");
+      shareButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        shareCard(cardId, uniqueId, shareButton);
+      });
+
+      const downloadButton = document.createElement("button");
+      downloadButton.innerHTML = '<i class="fas fa-download"></i> تنزيل كصورة';
+      downloadButton.className = "download-btn";
+      if (downloadedCards.has(uniqueId)) downloadButton.classList.add("active-download");
+      downloadButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        downloadCard(cardId, uniqueId, downloadButton);
+      });
+
+      const likeButton = document.createElement("button");
+      likeButton.className = "like-btn";
+      likeButton.innerHTML = '<i class="fa-solid fa-heart like-icon"></i> <span class="like-count">0</span>';
+      likeButton.style.padding = "3px 8px";
+      likeButton.style.borderRadius = "0";
+      likeButton.style.cursor = "pointer";
+      likeButton.style.background = "#FFF7D1";
+      likeButton.style.border = "1px solid #000";
+      likeButton.style.boxShadow = "2px 2px 0 #000";
+      likeButton.style.fontSize = "11px";
+
+      setupLikeState(uniqueId, likeButton);
+
+      buttonsDiv.appendChild(favButton);
+      buttonsDiv.appendChild(shareButton);
+      buttonsDiv.appendChild(downloadButton);
+      buttonsDiv.appendChild(likeButton);
+
+      return buttonsDiv;
+    }
+
+    function toggleFavorite(uniqueId, favBtn) {
+      const wrapper = document.getElementById(uniqueId);
+      if (favorites.has(uniqueId)) {
+        favorites.delete(uniqueId);
+        favBtn.classList.remove("active");
+        if (wrapper) wrapper.classList.remove("favorite");
+      } else {
+        favorites.add(uniqueId);
+        favBtn.classList.add("active");
+        if (wrapper) wrapper.classList.add("favorite");
+      }
+      saveFavoritesLocal();
+      if (currentUser) saveFavoritesToServer();
+      updateFavoritesCount();
+    }
+
+    function shareCard(cardId, uniqueId, buttonEl) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+      const original = card.style.transform;
+      card.style.transform = "none";
+      html2canvas(card, { useCORS: true, scale: 4, imageSmoothingEnabled: false }).then(canvas => {
+        card.style.transform = original;
+        const link = document.createElement("a");
+        link.download = "card.png";
+        link.href = canvas.toDataURL();
+        link.click();
+        sharedCards.add(uniqueId);
+        if (buttonEl) buttonEl.classList.add("active-share");
+      });
+    }
+
+    function downloadCard(cardId, uniqueId, buttonEl) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+      const original = card.style.transform;
+      card.style.transform = "none";
+      html2canvas(card, { useCORS: true, scale: 4, imageSmoothingEnabled: false }).then(canvas => {
+        card.style.transform = original;
+        let fileName = "card";
+        const titleEl = card.querySelector(".anime-title");
+        if (titleEl && titleEl.textContent) {
+          fileName = titleEl.textContent.trim().replace(/[/\\?%*:|"<>]/g, "_");
+        }
+        const link = document.createElement("a");
+        link.download = fileName + ".png";
+        link.href = canvas.toDataURL();
+        link.click();
+        downloadedCards.add(uniqueId);
+        if (buttonEl) buttonEl.classList.add("active-download");
+      });
+    }
+
+    function renderCardsWithFilters(showFavOnly) {
+      const dataContainer = document.getElementById("data-container");
+      if (!dataContainer) return;
+      const container = document.createElement("div");
+      container.className = "cards-container";
+
+      const filtered = getFilteredAnime(showFavOnly);
+      const totalItems = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const pageItems = filtered.slice(startIndex, endIndex);
+
+      pageItems.forEach((item, index) => {
+        const wrapper = createCardWrapper(item.uniqueId, item.anime, index);
+        container.appendChild(wrapper);
+      });
+
+      dataContainer.innerHTML = "";
+      dataContainer.appendChild(container);
+      renderPagination(totalItems);
+
+      // إعادة بناء قيم الفلاتر (حسب النتيجة الحالية)
+      ["Episode","Source","Studio","Aired","Genre","Theme"].forEach(populateCustomDropdown);
+    }
+
+    function toggleFavorites() {
+      showFavoritesOnly = !showFavoritesOnly;
+      currentPage = 1;
+      updateFavoritesCount();
+      renderCardsWithFilters(showFavoritesOnly);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const favBtn = document.getElementById("favoritesToggle");
+      const searchInput = document.getElementById("searchBox");
+      const topLikesBtn = document.getElementById("topLikesFilterBtn");
+      const backToTop = document.getElementById("backToTop");
+      const loader = document.getElementById("loader");
+      const progressBar = document.getElementById("progressBar");
+      const dataContainer = document.getElementById("data-container");
+
+      loadFavoritesLocal();
+      loadLocalLikes();
+      updateFavoritesCount();
+
+      ["Episode","Source","Studio","Aired","Genre","Theme"].forEach(ft => {
+        setupCustomDropdown(ft);
+      });
+
+      if (favBtn) {
+        favBtn.addEventListener("click", toggleFavorites);
+      }
+      if (searchInput) {
+        searchInput.addEventListener("input", function () {
+          currentPage = 1;
+          renderCardsWithFilters(isShowingFavoritesOnly());
+        });
+      }
+      if (topLikesBtn) {
+        topLikesBtn.addEventListener("click", toggleTopLikesMode);
+      }
+
+      window.addEventListener("scroll", function () {
+        if (window.scrollY > 300) {
+          backToTop.style.display = "flex";
+        } else {
+          backToTop.style.display = "none";
+        }
+      });
+      backToTop.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Firebase Auth زر تسجيل الدخول
+      const loginBtnEl = document.getElementById("loginSyncBtn");
+      if (auth && loginBtnEl) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.onAuthStateChanged(user => {
+          currentUser = user;
+          if (user) {
+            loginBtnEl.innerHTML = 'تسجيل خروج <span class="fa-brands fa-google"></span>';
+            mergeFavoritesWithServer();
+          } else {
+            loginBtnEl.innerHTML = 'سجّل لحفظ مفضلتك <span class="fa-brands fa-google"></span>';
+            currentUser = null;
+            loadFavoritesLocal();
+            updateFavoritesCount();
+            renderCardsWithFilters(isShowingFavoritesOnly());
+          }
+        });
+        loginBtnEl.addEventListener("click", () => {
+          if (!currentUser) {
+            auth.signInWithPopup(provider).catch(err => console.log("Auth error:", err));
+          } else {
+            auth.signOut().catch(err => console.log("Signout error:", err));
+          }
+        });
+      } else if (loginBtnEl) {
+        loginBtnEl.style.display = "none";
+      }
+
+      // عرض اللودر بشكل بسيط
+      if (progressBar) {
+        progressBar.style.width = "30%";
+        setTimeout(() => { progressBar.style.width = "70%"; }, 200);
+        setTimeout(() => {
+          progressBar.style.width = "100%";
+          if (loader) loader.style.display = "none";
+          if (dataContainer) dataContainer.style.display = "block";
+          renderCardsWithFilters(false);
+        }, 500);
+      } else {
+        if (loader) loader.style.display = "none";
+        if (dataContainer) dataContainer.style.display = "block";
+        renderCardsWithFilters(false);
+      }
+    });
+  </script>
+</body>
+</html>
