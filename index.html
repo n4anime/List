@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>قائمة الأنمي - 02</title>
+  <title>قائمة الأنمي - 03</title>
 
   <!-- خطوط وأيقونات -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,6 @@
 
   <!-- مكتبات مساعدة -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <!-- Firebase compat -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -21,577 +20,343 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <style>
-    .count {
-      background: #0000001c;
-      color: #676767;
-      padding: 0px 0px;
-      border-radius: 50%;
-      font-size: 11px;
-      display: inline-flex;
-      min-width: 15px;
-      min-height: 15px;
-      align-items: center;
-      justify-content: center;
-    }
+    *{box-sizing:border-box;font-family:'Baloo Bhaijaan 2',sans-serif;}
+    body{margin:0;padding:0;background:#FFE666;direction:rtl;}
+    .fa,.fas,.far,.fal,.fab{font-family:"Font Awesome 6 Free" !important;}
 
-    * {
-      font-family: 'Baloo Bhaijaan 2', sans-serif;
-      box-sizing: border-box;
+    /* شريط علوي */
+    #top-bar{
+      background:#9bbbb2;
+      border:1px solid #000;
+      box-shadow:2px 2px 0 #000;
+      margin:15px 10px 5px;
+      padding:6px 10px;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
+    #site-logo{max-height:60px;}
+    #top-controls{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
 
-    .fa, .fas, .far, .fal, .fab {
-      font-family: "Font Awesome 6 Free" !important;
+    #searchBox{
+      padding:5px 8px;
+      border:1px solid #000;
+      background:#FFF7D1;
+      box-shadow:2px 2px 0 #000;
+      min-width:150px;
     }
+    #searchBox:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000;}
 
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #FFE666;
-      direction: rtl;
+    .top-btn{
+      padding:6px 10px;
+      border:1px solid #000;
+      border-radius:0;
+      background:#FFF7D1;
+      box-shadow:2px 2px 0 #000;
+      cursor:pointer;
+      font-size:13px;
     }
-
-    /* شريط أعلى الصفحة */
-    #top-bar {
-      background-color: #9bbbb2;
-      border-radius: 0;
-      border: 1px solid #000;
-      box-shadow: 2px 2px 0 #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin: 15px 10px 5px;
-    }
-    #logo-box {
-      flex: 0 0 auto;
-    }
-    #site-logo {
-      max-height: 70px;
-      width: auto;
-      display: block;
-    }
-    #top-controls {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    #search-container {
-      text-align: center;
-      margin: 5px 0;
-    }
-    #searchBox {
-      box-shadow: 2px 2px 0 #000;
-      background-color: #FFF7D1;
-      border-radius: 0;
-      border: 1px solid #000;
-      padding: 6px 5px;
-      font-size: 14px;
-      width: 150px;
-      max-width: 70vw;
-    }
-    #searchBox:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 #000;
-    }
-
-    #favoritesToggle,
-    #loginSyncBtn,
-    #topLikesFilterBtn {
-      margin: 0;
-      padding: 6px 10px;
-      border-radius: 0;
-      border: 1px solid #000;
-      cursor: pointer;
-      box-shadow: 2px 2px 0 #000;
-      font-family: 'Baloo Bhaijaan 2', cursive;
-      font-size: 13px;
-      background-color: #FFF7D1;
-      color: #111;
-    }
-    #favoritesToggle {
-      background-color: #FFEE58;
-    }
-    #loginSyncBtn {
-      background-color: #FFFFFF;
-    }
-    #topLikesFilterBtn {
-      background-color: #FFD4D4;
-    }
-    #topLikesFilterBtn.active-toplikes {
-      background-color: #FF6B6B;
-      color: #fff;
-      font-weight: bold;
-    }
-    #favoritesToggle:hover,
-    #loginSyncBtn:hover,
-    #topLikesFilterBtn:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 #000;
-    }
+    .top-btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000;}
+    #favoritesToggle{background:#FFEE58;}
+    #topLikesFilterBtn{background:#FFD4D4;}
+    #topLikesFilterBtn.active-toplikes{background:#FF6B6B;color:#fff;font-weight:bold;}
 
     /* الفلاتر */
-    #filter-settings {
-      text-align: center;
-      margin-bottom: 4px;
+    #filter-settings{text-align:center;margin-bottom:4px;}
+    .dropdown-check-list{
+      display:inline-flex;
+      position:relative;
+      margin:3px;
+      width:180px;
+      justify-content:center;
+    }
+    .dropdown-check-list .anchor{
+      width:100%;
+      padding:8px 28px 8px 10px;
+      border:1px solid #000;
+      background:#FFF7D1;
+      box-shadow:2px 2px 0 #000;
+      cursor:pointer;
+      text-align:center;
+      position:relative;
+    }
+    .dropdown-check-list .anchor:after{
+      content:"";
+      position:absolute;
+      border-left:2px solid #000;
+      border-top:2px solid #000;
+      padding:4px;
+      right:8px;
+      top:30%;
+      transform:rotate(-135deg);
+    }
+    .dropdown-check-list.visible .anchor{
+      transform:translate(-2px,-2px);
+      box-shadow:4px 4px 0 #000;
+    }
+    .dropdown-check-list ul.items{
+      display:none;
+      position:absolute;
+      top:100%;
+      left:0;
+      width:100%;
+      background:#fff;
+      border:1px solid #000;
+      box-shadow:2px 2px 0 #000;
+      max-height:250px;
+      overflow-y:auto;
+      margin:0;
+      padding:3px;
+      z-index:50;
+    }
+    .dropdown-check-list.visible ul.items{display:block;}
+    .dropdown-check-list ul.items li{list-style:none;margin:2px 0;}
+    .dropdown-check-list ul.items label{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:2px 4px;
+      border:1px solid #000;
+      background:#fff;
+      box-shadow:2px 2px 0 #000;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .dropdown-check-list ul.items label:hover{background:#FFF0B3;}
+    .dropdown-check-list ul.items input{width:14px;height:14px;}
+
+    #list-Episode .anchor{background:#d0eaff;color:#007acc;}
+    #list-Source .anchor{background:#d0f5d0;color:#2e8b57;}
+    #list-Studio .anchor{background:#ffe5cc;color:#ff8c00;}
+    #list-Aired  .anchor{background:#e6d0ff;color:#800080;}
+    #list-Genre  .anchor{background:#ffd0e8;color:#c2185b;}
+    #list-Theme  .anchor{background:#d0fff8;color:#00897b;}
+
+    @media(max-width:900px){
+      .dropdown-check-list{width:45%;}
+      .dropdown-check-list .anchor{width:100%;}
     }
 
-    .dropdown-check-list {
-      display: inline-flex;
-      margin: 3px;
-      position: relative;
-      flex-wrap: wrap;
-      align-content: center;
-      justify-content: center;
-      align-items: center;
-      width: 170px;
-    }
-
-    .dropdown-check-list .anchor {
-      position: relative;
-      cursor: pointer;
-      display: inline-block;
-      padding: 10px 30px 10px 15px;
-      border: 1px solid #000;
-      width: 100%;
-      text-align: center;
-      background-color: #FFF7D1;
-      box-shadow: 2px 2px 0 #000;
-    }
-    .dropdown-check-list .anchor:after {
-      position: absolute;
-      content: "";
-      border-left: 2px solid black;
-      border-top: 2px solid black;
-      padding: 5px;
-      right: 10px;
-      top: 20%;
-      transform: rotate(-135deg);
-    }
-    .dropdown-check-list.visible .anchor {
-      transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 #000;
-    }
-
-    .dropdown-check-list ul.items {
-      padding: 1px;
-      display: none;
-      margin: 0;
-      border: 1px solid #000;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      z-index: 999;
-      background: #fff;
-      max-height: 400px;
-      overflow-y: auto;
-      box-shadow: 2px 2px 0 #000;
-    }
-    .dropdown-check-list.visible .items {
-      display: block;
-    }
-
-    .dropdown-check-list ul.items li {
-      list-style: none;
-      padding: 3px;
-    }
-    .dropdown-check-list ul.items li label {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background-color: #FFFFFF;
-      border-radius: 0;
-      border: 1px solid #000;
-      padding: 2px 5px;
-      box-shadow: 2px 2px 0 #000;
-      line-height: 1.5;
-    }
-    .dropdown-check-list ul.items li label:hover {
-      background-color: #FFF0B3;
-    }
-    .dropdown-check-list ul.items li input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
-    }
-    .dropdown-check-list ul.items li label .option-text {
-      background: transparent;
-      padding: 0;
-    }
-
-    #list-Episode .anchor {
-      background-color: #d0eaff;
-      color: #007acc;
-    }
-    #list-Source .anchor {
-      background-color: #d0f5d0;
-      color: #2e8b57;
-    }
-    #list-Studio .anchor {
-      background-color: #ffe5cc;
-      color: #ff8c00;
-    }
-    #list-Aired .anchor {
-      background-color: #e6d0ff;
-      color: #800080;
-    }
-    #list-Genre .anchor {
-      background-color: #ffd0e8;
-      color: #c2185b;
-    }
-    #list-Theme .anchor {
-      background-color: #d0fff8;
-      color: #00897b;
-    }
-
-    @media (max-width: 1000px) {
-      .dropdown-check-list {
-        width: 45%;
-      }
-      .dropdown-check-list .anchor {
-        width: 90%;
-      }
+    .count{
+      background:#0000001c;
+      color:#676767;
+      padding:0 4px;
+      border-radius:999px;
+      font-size:11px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:18px;
     }
 
     /* الكروت */
-    .cards-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      padding: 10px;
-      max-width: 1200px;
-      margin: 0 auto 40px;
+    .cards-container{
+      max-width:1200px;
+      margin:10px auto 40px;
+      padding:5px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
     }
-    .card-wrapper {
-      width: 250px;
-      margin: 5px;
-      position: relative;
+    .card-wrapper{width:250px;position:relative;}
+    .anime-card{
+      width:100%;
+      height:360px;
+      background:#000;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow:0 20px 0 #000;
     }
-    .top-like-rank {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      padding: 2px 6px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      background: rgba(0,0,0,0.5);
-      border-radius: 4px;
+    .card-bg{
+      position:absolute;inset:0;
+      background-size:cover;
+      background-position:center;
+      filter:blur(2px);
+      transform:scale(1.05);
+      z-index:0;
     }
-    .anime-card {
-      width: 250px;
-      min-height: 350px;
-      height: 350px;
-      position: relative;
-      color: #fff;
-      overflow: hidden;
-      box-shadow: 0px 30px 0px 0px rgb(0 0 0);
-      background-color: #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:1;}
+    .shadow-top{
+      position:absolute;left:0;top:0;width:100%;height:40%;
+      background:linear-gradient(to bottom,#000,transparent);z-index:2;
     }
-    .card-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      background-size: cover;
-      background-position: center;
+    .shadow-bottom{
+      position:absolute;left:0;bottom:0;width:100%;height:40%;
+      background:linear-gradient(to top,#000,transparent);z-index:2;
     }
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1;
+    .card-header-logo,.card-footer-logo,
+    .card-top-bar,.card-content,.story-box,.card-buttons{
+      position:relative;z-index:3;
     }
-    .shadow-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 40%;
-      background: linear-gradient(to bottom, rgb(0 0 0), transparent);
-      z-index: 2;
+    .card-header-logo,.card-footer-logo{text-align:center;padding:3px 0;}
+    .card-header-logo img,.card-footer-logo img{max-width:70px;}
+    .card-top-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 4px;
     }
-    .shadow-bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 40%;
-      background: linear-gradient(to top, rgb(0 0 0), transparent);
-      z-index: 2;
+    .anime-title{
+      flex:1;
+      margin:0 4px;
+      padding:2px 4px;
+      background:rgba(0,0,0,.5);
+      border-radius:4px;
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      text-align:center;
     }
-    .card-header-logo,
-    .card-footer-logo,
-    .card-top-bar,
-    .card-content,
-    .story-box,
-    .card-buttons {
-      position: relative;
-      z-index: 3;
+    .rating-area{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:2px 4px;
+      background:rgba(0,128,255,.4);
+      border-radius:4px;
+      font-size:12px;
     }
-    .card-header-logo,
-    .card-footer-logo {
-      text-align: center;
-      padding: 4px 1px;
+    .rating-area img{width:22px;}
+    .card-content{
+      display:flex;
+      gap:4px;
+      padding:3px 4px;
+      font-size:12px;
     }
-    .card-header-logo img,
-    .card-footer-logo img {
-      max-width: 35%;
-      padding: 2px 1px;
-      height: auto;
+    .poster-div{width:60px;height:85px;border-radius:4px;overflow:hidden;flex-shrink:0;}
+    .poster-img{width:100%;height:100%;object-fit:cover;}
+    .info-boxes{flex:1;display:flex;flex-direction:column;gap:3px;}
+    .info-row{display:flex;gap:3px;}
+    .info-box,.info-box-genre{
+      flex:1;
+      padding:2px 4px;
+      border-radius:4px;
+      background:rgba(0,0,0,.45);
+      font-size:11px;
+      text-align:center;
+      line-height:1.3;
     }
-    .card-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2px 4px;
+    .info-box strong,.info-box-genre strong{
+      font-size:9px;
+      color:#fffae0;
     }
-    .anime-title {
-      background: rgba(0,0,0,0.4);
-      padding: 2px 4px;
-      border-radius: 5px;
-      font-size: 13.1px;
-      flex: 1;
-      margin: 0 4px;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-weight: bold;
-    }
-    .rating-area {
-      display: flex;
-      align-items: center;
-      background: rgb(0 128 255 / 38%);
-      padding: 2px 4px;
-      border-radius: 5px;
-      font-size: 13.1px;
-      gap: 4px;
-    }
-    .rating-area img {
-      width: 25px;
-    }
-    .card-content {
-      display: flex;
-      flex-direction: row;
-      padding: 3px;
-      gap: 2px;
-      font-size: 13.1px;
-    }
-    .poster-div {
-      width: 56px;
-      height: 83px;
-      border-radius: 5px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .poster-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 5px;
-    }
-    .info-boxes {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .info-row {
-      display: flex;
-      gap: 2px;
-    }
-    .info-column {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      width: 100%;
-    }
-    .info-box {
-      background: rgba(0,0,0,0.4);
-      padding: 2px 4px;
-      border-radius: 5px;
-      font-size: 13.1px;
-      line-height: 1.2;
-      flex: 1;
-      text-align: center;
-    }
-    .info-box strong,
-    .info-box-genre strong {
-      margin-left: 2px;
-      font-weight: bold;
-      color: #fffae0;
-      font-size: 8px;
-    }
-    .info-box span {
-      font-size: 12px;
-    }
-    .info-box-genre {
-      background: rgba(0,0,0,0.4);
-      padding: 2px 4px;
-      border-radius: 5px;
-      font-size: 13.1px;
-      line-height: 1.2;
-      flex: 1;
-      text-align: center;
-    }
-    .story-box {
-      background: rgba(0,0,0,0.5);
-      margin: 2px;
-      padding: 1px;
-      border-radius: 5px;
-      font-size: 13.1px;
-      line-height: 1.3;
+    .story-box{
+      margin:2px 4px 4px;
+      padding:2px 4px;
+      border-radius:4px;
+      background:rgba(0,0,0,.6);
+      font-size:11px;
+      max-height:95px;
+      overflow-y:auto;
     }
 
-    /* أزرار الكرت */
-    .card-buttons {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 4px;
+    .top-like-rank{
+      position:absolute;
+      top:4px;
+      right:4px;
+      background:rgba(0,0,0,.7);
+      color:#fff;
+      padding:2px 6px;
+      border-radius:4px;
+      font-size:13px;
+      font-weight:bold;
+      z-index:4;
     }
-    .card-buttons button {
-      background-color: #FFFFFF;
-      border: 1px solid #000;
-      color: #111;
-      padding: 3px 4px;
-      border-radius: 0;
-      font-size: 11px;
-      cursor: pointer;
-      font-weight: 400;
-      box-shadow: 2px 2px 0 #000;
+
+    /* أزرار أسفل الكرت */
+    .card-buttons{
+      display:flex;
+      justify-content:space-between;
+      gap:3px;
+      padding:0 4px 4px;
     }
-    .favorite-btn.active {
-      background: gold;
-      color: #000;
+    .card-buttons button{
+      flex:1;
+      padding:3px 4px;
+      border:1px solid #000;
+      border-radius:0;
+      background:#fff;
+      color:#111;
+      font-size:11px;
+      box-shadow:2px 2px 0 #000;
+      cursor:pointer;
+      white-space:nowrap;
     }
-    .share-btn.active-share {
-      background-color: #cce9ff;
-      color: #000;
-    }
-    .download-btn.active-download {
-      background-color: #d5ffd5;
-      color: #000;
-    }
+    .card-buttons button:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000;}
+    .favorite-btn.active{background:gold;}
+    .share-btn.active-share{background:#cce9ff;}
+    .download-btn.active-download{background:#d5ffd5;}
+    .like-btn{background:#FFF7D1;}
+    .like-icon{margin-left:3px;}
 
     /* الترقيم */
-    #pagination,
-    #pagination-bottom {
-      text-align: center;
-      margin: 10px 0;
+    #pagination,#pagination-bottom{
+      text-align:center;
+      margin:8px 0;
     }
-    #pagination button,
-    #pagination-bottom button {
-      margin: 5px;
-      padding: 3px 11px;
-      border-radius: 0;
-      border: 1px solid #000;
-      cursor: pointer;
-      background-color: #FFF7D1;
-      box-shadow: 2px 2px 0 #000;
-      font-family: 'Baloo Bhaijaan 2', cursive;
+    #pagination button,#pagination-bottom button{
+      margin:2px;
+      padding:3px 10px;
+      border:1px solid #000;
+      background:#FFF7D1;
+      box-shadow:2px 2px 0 #000;
+      cursor:pointer;
+      font-size:13px;
     }
-    #pagination button.active-page,
-    #pagination-bottom button.active-page {
-      background-color: #0088cc;
-      color: #fff;
-      font-weight: bold;
-    }
-    #pagination button:hover,
-    #pagination-bottom button:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 #000;
+    #pagination button.active-page,#pagination-bottom button.active-page{
+      background:#0088cc;color:#fff;font-weight:bold;
     }
 
     /* لودر بسيط */
-    #loader {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #111;
-      font-weight: 600;
+    #loader{text-align:center;margin-top:8px;font-size:14px;font-weight:bold;}
+    #progressContainer{
+      width:80%;max-width:400px;height:18px;margin:8px auto;
+      border:2px solid #000;border-radius:16px;overflow:hidden;background:#fff;
     }
-    #progressContainer {
-      width: 80%;
-      max-width: 400px;
-      height: 20px;
-      background: #FFF;
-      border-radius: 16px;
-      border: 3px solid #000;
-      margin: 10px auto;
-      overflow: hidden;
+    #progressBar{
+      height:100%;width:0;background:#FFB74D;transition:width .4s;
     }
-    #progressBar {
-      height: 100%;
-      width: 0%;
-      background: #FFB74D;
-      transition: width 0.4s;
-    }
+    #data-container{display:none;}
 
-    #data-container {
-      text-align: center;
-      margin-top: 15px;
-      display: none;
+    /* زر أعلى الصفحة */
+    #backToTop{
+      position:fixed;
+      left:20px;
+      bottom:20px;
+      width:40px;height:40px;
+      border-radius:999px;
+      border:1px solid #000;
+      background:#FFF7D1;
+      box-shadow:2px 2px 0 #000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      z-index:999;
     }
-
-    /* زر رجوع لأعلى */
-    #backToTop {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      border: 1px solid #000;
-      background-color: #FFF7D1;
-      box-shadow: 2px 2px 0 #000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 999;
-    }
-    #backToTop i {
-      pointer-events: none;
-    }
-    #backToTop:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 4px 4px 0 #000;
-    }
+    #backToTop:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 #000;}
   </style>
 </head>
 <body>
-
   <header>
     <div id="top-bar">
-      <div id="logo-box">
-        <img id="site-logo" src="https://i.suar.me/OzJaa/l" alt="شعار الموقع">
-      </div>
+      <img id="site-logo" src="https://i.suar.me/OzJaa/l" alt="شعار الموقع">
       <div id="top-controls">
-        <div id="search-container">
-          <input type="text" id="searchBox" placeholder="ابحث هنا..." />
-        </div>
-        <button id="favoritesToggle"><i class="fas fa-bookmark"></i> اظهار المفضلات (0)</button>
-        <button id="loginSyncBtn">سجّل لحفظ مفضلتك <span class="fa-brands fa-google"></span></button>
-        <button id="topLikesFilterBtn"><i class="fa-solid fa-fire"></i> أفضل اللايكات</button>
+        <input id="searchBox" type="text" placeholder="ابحث هنا..." />
+        <button id="favoritesToggle" class="top-btn"><i class="fas fa-bookmark"></i> اظهار المفضلات (0)</button>
+        <button id="loginSyncBtn" class="top-btn"><i class="fa-brands fa-google"></i> سجل لحفظ مفضلتك</button>
+        <button id="topLikesFilterBtn" class="top-btn"><i class="fa-solid fa-fire"></i> أفضل اللايكات</button>
       </div>
     </div>
 
-    <!-- الفلاتر -->
     <div id="filter-settings">
       <div id="list-Episode" class="dropdown-check-list" tabindex="100">
         <span class="anchor"><i class="fa-solid fa-list-ol"></i> فلتر الحلقات</span>
@@ -635,7 +400,7 @@
   <button id="backToTop" title="أعلى الصفحة"><i class="fa-solid fa-arrow-up"></i></button>
 
   <script>
-    // إعداد Firebase (نفس مفاتيح مدونتك)
+    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBbYZ7Zk7Aoi7ePeSx2MM0t-T9vDFXtxxo",
       authDomain: "allanimefir.firebaseapp.com",
@@ -646,22 +411,12 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    let auth = null;
-    let db = null;
-    let favoritesCollection = null;
-    let likesCollection = null;
-    let currentUser = null;
+    let auth = firebase.auth();
+    let db   = firebase.firestore();
+    let favoritesCollection = db.collection("favorites");
+    let likesCollection     = db.collection("likes");
 
-    try {
-      auth = firebase.auth();
-      db = firebase.firestore();
-      favoritesCollection = db.collection("favorites");
-      likesCollection = db.collection("likes");
-    } catch (e) {
-      console.error("Firebase init error:", e);
-    }
-
-    // بيانات الأنمي (تقدر تزودها براحتك)
+    // بيانات الأنمي (مثال – زوّدها براحتك)
     const allAnimeData = [
       {
         Numb: "1",
@@ -687,844 +442,800 @@
         Studio: "Manglobe",
         Genre: "أكشن, كوميديا",
         Theme: "بالغين, محاكاة ساخرة, قوة خارقة",
-        Story: "ماسايوشي هازاما عارض أزياء يعيش حلم الأبطال الخارقين باسم ساموراي فلامينكو. يناضل ضد المخالفات البسيطة حتى الجرائم الكبرى، ينكشف سره أمام الشرطي غوتو، وتتصاعد الأحداث لتطال مصير العالم كله."
+        Story: "ماسايوشي هازاما عارض أزياء يعيش حلم الأبطال الخارقين باسم  ساموراي فلامينكو يناضل ضد المخالفات البسيطة حتى الجرائم الكبرى، ينكشف سره أمام الشرطي غوتو، وتتصاعد الأحداث لتطال مصير العالم كله."
       }
     ];
 
-    // حالات عامة
-    let favorites = new Set();
+    // متغيرات عامة
+    const LOCAL_FAV_KEY   = "animeFavorites";
+    const LOCAL_LIKES_KEY = "animeLikesLocal";
+    const LOCAL_GUEST_ID  = "animeGuestId";
+
+    let favorites   = new Set();
+    let localLikes  = null;  // {cardId:true}
     let sharedCards = new Set();
     let downloadedCards = new Set();
-    const LOCAL_FAV_KEY = "animeFavorites";
-    const LOCAL_LIKES_KEY = "animeLikesLocal";
-    let localLikes = null;
+
+    let currentUser = null;
 
     let activeFilters = {
       Episode: [],
       Source: [],
       Studio: [],
-      Aired: [],
-      Genre: [],
-      Theme: []
+      Aired:  [],
+      Genre:  [],
+      Theme:  []
     };
 
     const pageSize = 50;
-    let currentPage = 1;
-    let showFavoritesOnly = false;
-    let topLikesMode = false;
-    let topLikesList = [];
+    let currentPage     = 1;
+    let showFavOnly     = false;
+    let topLikesMode    = false;
+    let topLikesList    = [];
 
-    function loadLocalLikes() {
-      if (localLikes !== null) return;
-      try {
-        const stored = localStorage.getItem(LOCAL_LIKES_KEY);
-        localLikes = stored ? JSON.parse(stored) : {};
-      } catch (e) {
-        localLikes = {};
+    // helpers
+    function getGuestId(){
+      let id = localStorage.getItem(LOCAL_GUEST_ID);
+      if(!id){
+        id = "g_" + Math.random().toString(36).slice(2);
+        localStorage.setItem(LOCAL_GUEST_ID,id);
       }
-    }
-    function saveLocalLikes() {
-      if (!localLikes) return;
-      try {
-        localStorage.setItem(LOCAL_LIKES_KEY, JSON.stringify(localLikes));
-      } catch (e) {}
+      return id;
     }
 
-    function loadFavoritesLocal() {
-      try {
-        const stored = localStorage.getItem(LOCAL_FAV_KEY);
-        favorites = stored ? new Set(JSON.parse(stored)) : new Set();
-      } catch (e) {
-        favorites = new Set();
-      }
+    function loadLocalLikes(){
+      if(localLikes !== null) return;
+      try{
+        const s = localStorage.getItem(LOCAL_LIKES_KEY);
+        localLikes = s ? JSON.parse(s) : {};
+      }catch(e){localLikes = {};}
     }
-    function saveFavoritesLocal() {
-      try {
+    function saveLocalLikes(){
+      try{ localStorage.setItem(LOCAL_LIKES_KEY, JSON.stringify(localLikes || {})); }
+      catch(e){}
+    }
+    function loadFavoritesLocal(){
+      try{
+        const s = localStorage.getItem(LOCAL_FAV_KEY);
+        favorites = s ? new Set(JSON.parse(s)) : new Set();
+      }catch(e){favorites = new Set();}
+    }
+    function saveFavoritesLocal(){
+      try{
         localStorage.setItem(LOCAL_FAV_KEY, JSON.stringify(Array.from(favorites)));
-      } catch (e) {}
+      }catch(e){}
     }
-
-    function saveFavoritesToServer() {
-      if (!favoritesCollection || !currentUser) return;
-      const arr = Array.from(favorites);
-      favoritesCollection.doc(currentUser.uid).set({ items: arr }, { merge: true }).catch(console.error);
+    function saveFavoritesToServer(){
+      if(!currentUser) return;
+      favoritesCollection
+        .doc(currentUser.uid)
+        .set({items: Array.from(favorites)}, {merge:true})
+        .catch(console.error);
     }
-
-    function mergeFavoritesWithServer() {
-      if (!favoritesCollection || !currentUser) {
-        loadFavoritesLocal();
-        updateFavoritesCount();
-        renderCardsWithFilters(isShowingFavoritesOnly());
-        return;
-      }
+    function mergeFavoritesWithServer(){
+      if(!currentUser){loadFavoritesLocal();updateFavoritesCount();renderCardsWithFilters(showFavOnly);return;}
       let localArr = [];
-      try {
-        const stored = localStorage.getItem(LOCAL_FAV_KEY);
-        localArr = stored ? JSON.parse(stored) : [];
-      } catch (e) {
-        localArr = [];
-      }
-      favoritesCollection.doc(currentUser.uid).get().then(doc => {
+      try{
+        const s = localStorage.getItem(LOCAL_FAV_KEY);
+        localArr = s ? JSON.parse(s) : [];
+      }catch(e){localArr = [];}
+      favoritesCollection.doc(currentUser.uid).get().then(doc=>{
         const union = new Set(localArr);
-        if (doc.exists && Array.isArray(doc.data().items)) {
-          doc.data().items.forEach(x => union.add(x));
+        if(doc.exists && Array.isArray(doc.data().items)){
+          doc.data().items.forEach(id=>union.add(id));
         }
         favorites = union;
         saveFavoritesLocal();
         saveFavoritesToServer();
         updateFavoritesCount();
-        renderCardsWithFilters(isShowingFavoritesOnly());
-      }).catch(err => {
-        console.error("mergeFavoritesWithServer error:", err);
+        renderCardsWithFilters(showFavOnly);
+      }).catch(err=>{
+        console.error(err);
         loadFavoritesLocal();
         updateFavoritesCount();
-        renderCardsWithFilters(isShowingFavoritesOnly());
+        renderCardsWithFilters(showFavOnly);
       });
     }
 
-    function updateFavoritesCount() {
+    function updateFavoritesCount(){
       const btn = document.getElementById("favoritesToggle");
-      if (!btn) return;
-      const label = showFavoritesOnly ? "اظهار الكل" : "اظهار المفضلات";
-      btn.innerHTML = '<i class="fas fa-bookmark"></i> ' + label + " (" + favorites.size + ")";
+      if(!btn) return;
+      const label = showFavOnly ? "اظهار الكل" : "اظهار المفضلات";
+      btn.innerHTML = '<i class="fas fa-bookmark"></i> ' + label + " ("+favorites.size+")";
     }
 
-    function isShowingFavoritesOnly() {
-      return showFavoritesOnly;
-    }
+    function isShowingFavoritesOnly(){return showFavOnly;}
 
-    function matchesSearch(anime, query) {
-      if (!query) return true;
-      for (let key in anime) {
-        if (anime[key] && anime[key].toString().toLowerCase().includes(query)) {
-          return true;
-        }
+    // بحث
+    function matchesSearch(anime,q){
+      if(!q) return true;
+      q = q.toLowerCase();
+      for(let k in anime){
+        if(anime[k] && anime[k].toString().toLowerCase().includes(q)) return true;
       }
       return false;
     }
-
-    function getUniqueId(anime, index) {
-      if (anime.Numb) return "wrapper-" + anime.Numb;
-      return "wrapper-" + (index + 1);
+    function getUniqueId(anime,index){
+      return "wrapper-"+(anime.Numb || (index+1));
     }
 
-    function getFilteredAnime(showFavOnly) {
-      const searchBox = document.getElementById("searchBox");
-      const searchQuery = searchBox ? searchBox.value.trim().toLowerCase() : "";
+    function getFilteredAnime(showFav){
+      const searchInput = document.getElementById("searchBox");
+      const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
       const result = [];
+      allAnimeData.forEach((anime,idx)=>{
+        const uid = getUniqueId(anime,idx);
+        if(showFav && !favorites.has(uid)) return;
+        if(!matchesSearch(anime,q)) return;
 
-      allAnimeData.forEach((anime, index) => {
-        const uniqueId = getUniqueId(anime, index);
-        if (showFavOnly && !favorites.has(uniqueId)) return;
-        if (!matchesSearch(anime, searchQuery)) return;
-
+        // فلاتر
         let pass = true;
-        for (let key in activeFilters) {
+        for(let key in activeFilters){
           const selected = activeFilters[key];
-          if (!selected || selected.length === 0) continue;
-
-          let animeValues = [];
-          if (key === "Genre" || key === "Theme") {
-            const raw = anime[key] || "";
-            animeValues = raw.split(",").map(v => v.trim()).filter(Boolean);
-          } else {
-            animeValues = [anime[key] || "-"];
+          if(!selected || selected.length===0) continue;
+          let vals = [];
+          if(key==="Genre"||key==="Theme"){
+            vals = (anime[key]||"").split(",").map(v=>v.trim()).filter(Boolean);
+          }else{
+            vals = [anime[key]||"-"];
           }
-          const ok = animeValues.some(v => selected.includes(v));
-          if (!ok) {
-            pass = false;
-            break;
-          }
+          const ok = vals.some(v=>selected.includes(v));
+          if(!ok){pass=false;break;}
         }
-        if (!pass) return;
-        result.push({ anime, uniqueId });
+        if(!pass) return;
+        result.push({anime,uniqueId:uid});
       });
 
-      if (topLikesMode && topLikesList.length > 0) {
-        result.sort((a, b) => {
+      if(topLikesMode && topLikesList.length>0){
+        result.sort((a,b)=>{
           const ia = topLikesList.indexOf(a.uniqueId);
           const ib = topLikesList.indexOf(b.uniqueId);
-          const pa = ia === -1 ? 99999 : ia;
-          const pb = ib === -1 ? 99999 : ib;
-          return pa - pb;
+          const pa = ia===-1?99999:ia;
+          const pb = ib===-1?99999:ib;
+          return pa-pb;
         });
-        return result.slice(0, 20);
+        return result.slice(0,50);
       }
-
       return result;
     }
 
-    function renderPagination(totalItems) {
-      const topPag = document.getElementById("pagination");
-      const bottomPag = document.getElementById("pagination-bottom");
-      if (topPag) topPag.innerHTML = "";
-      if (bottomPag) bottomPag.innerHTML = "";
-
-      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-      if (totalPages <= 1) return;
-
-      function makeBtn(page) {
-        const btn = document.createElement("button");
-        btn.textContent = page;
-        btn.className = "page-btn";
-        if (page === currentPage) btn.classList.add("active-page");
-        btn.addEventListener("click", () => {
-          currentPage = page;
-          renderCardsWithFilters(isShowingFavoritesOnly());
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-        return btn;
-      }
-
-      for (let i = 1; i <= totalPages; i++) {
-        const bt = makeBtn(i);
-        const bb = makeBtn(i);
-        if (topPag) topPag.appendChild(bt);
-        if (bottomPag) bottomPag.appendChild(bb);
-      }
-    }
-
-    function loadTopLikesList(callback) {
-      if (!likesCollection) {
-        callback([]);
-        return;
-      }
-      likesCollection.orderBy("count", "desc").limit(50).get()
-        .then(snap => {
-          const arr = [];
-          snap.forEach(doc => arr.push(doc.id));
-          callback(arr);
-        })
-        .catch(err => {
-          console.error("loadTopLikesList error:", err);
-          callback([]);
-        });
-    }
-
-    function toggleTopLikesMode() {
-      const btn = document.getElementById("topLikesFilterBtn");
-      if (!btn) return;
-
-      if (topLikesMode) {
-        topLikesMode = false;
-        topLikesList = [];
-        btn.classList.remove("active-toplikes");
-        currentPage = 1;
-        renderCardsWithFilters(isShowingFavoritesOnly());
-        return;
-      }
-
-      loadTopLikesList(list => {
-        topLikesList = list;
-        topLikesMode = true;
-        btn.classList.add("active-toplikes");
-        currentPage = 1;
-        renderCardsWithFilters(isShowingFavoritesOnly());
-      });
-    }
-
-    function populateCustomDropdown(filterType) {
-      const container = document.getElementById("list-" + filterType);
-      if (!container) return;
+    // فلاتر
+    function populateCustomDropdown(filterType){
+      const container = document.getElementById("list-"+filterType);
+      if(!container) return;
       const ul = container.querySelector(".items");
-      if (!ul) return;
+      if(!ul) return;
       ul.innerHTML = "";
 
       const liAll = document.createElement("li");
-      const checkboxAll = document.createElement("input");
-      checkboxAll.type = "checkbox";
-      checkboxAll.value = "all";
-      checkboxAll.checked = (activeFilters[filterType].length === 0);
-      checkboxAll.addEventListener("change", function () {
-        if (this.checked) {
-          activeFilters[filterType] = [];
-          ul.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-            if (chk.value !== "all") chk.checked = false;
-          });
-          currentPage = 1;
-          renderCardsWithFilters(isShowingFavoritesOnly());
+      const chkAll = document.createElement("input");
+      chkAll.type = "checkbox";
+      chkAll.value = "all";
+      chkAll.checked = activeFilters[filterType].length===0;
+      chkAll.addEventListener("change",function(){
+        if(this.checked){
+          activeFilters[filterType]=[];
+          ul.querySelectorAll('input[type="checkbox"]').forEach(c=>{if(c.value!=="all") c.checked=false;});
+          currentPage=1;renderCardsWithFilters(showFavOnly);
         }
       });
-      const labelAll = document.createElement("label");
-      labelAll.appendChild(checkboxAll);
+      const lblAll = document.createElement("label");
+      lblAll.appendChild(chkAll);
       const spanAll = document.createElement("span");
-      spanAll.className = "option-text";
       spanAll.textContent = " اظهار الكل";
-      labelAll.appendChild(spanAll);
-      liAll.appendChild(labelAll);
+      lblAll.appendChild(spanAll);
+      liAll.appendChild(lblAll);
       ul.appendChild(liAll);
 
-      let distinctValues = [];
+      let distinct = [];
       let counts = {};
-      const showFav = isShowingFavoritesOnly();
 
-      allAnimeData.forEach((anime, index) => {
-        const uniqueId = getUniqueId(anime, index);
-        if (showFav && !favorites.has(uniqueId)) return;
+      allAnimeData.forEach((anime,idx)=>{
+        const uid = getUniqueId(anime,idx);
+        if(showFavOnly && !favorites.has(uid)) return;
 
-        if (filterType === "Genre" || filterType === "Theme") {
-          const raw = anime[filterType] || "";
-          if (!raw) return;
-          const parts = raw.split(",").map(v => v.trim()).filter(Boolean);
-          const uniq = [...new Set(parts)];
-          uniq.forEach(val => {
-            if (!distinctValues.includes(val)) distinctValues.push(val);
-            counts[val] = (counts[val] || 0) + 1;
+        if(filterType==="Genre" || filterType==="Theme"){
+          const raw = anime[filterType]||"";
+          const arr = raw.split(",").map(v=>v.trim()).filter(Boolean);
+          [...new Set(arr)].forEach(v=>{
+            if(!distinct.includes(v)) distinct.push(v);
+            counts[v]=(counts[v]||0)+1;
           });
-        } else {
-          const value = anime[filterType] || "-";
-          if (!distinctValues.includes(value)) distinctValues.push(value);
-          counts[value] = (counts[value] || 0) + 1;
+        }else{
+          const v = anime[filterType]||"-";
+          if(!distinct.includes(v)) distinct.push(v);
+          counts[v]=(counts[v]||0)+1;
         }
       });
 
-      if (filterType === "Episode" || filterType === "Aired") {
-        distinctValues.sort((a, b) => {
-          const na = parseFloat(a);
-          const nb = parseFloat(b);
-          if (!isNaN(na) && !isNaN(nb)) return nb - na;
-          return a.toString().localeCompare(b.toString(), "ar");
+      if(filterType==="Episode"||filterType==="Aired"){
+        distinct.sort((a,b)=>{
+          const na=parseFloat(a), nb=parseFloat(b);
+          if(!isNaN(na)&&!isNaN(nb)) return nb-na;
+          return a.toString().localeCompare(b.toString(),"ar");
         });
-      } else {
-        distinctValues.sort((a, b) => a.toString().localeCompare(b.toString(), "ar"));
+      }else{
+        distinct.sort((a,b)=>a.toString().localeCompare(b.toString(),"ar"));
       }
 
-      distinctValues.forEach(val => {
+      distinct.forEach(val=>{
         const li = document.createElement("li");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.value = val;
-        if (activeFilters[filterType].includes(val)) checkbox.checked = true;
-        checkbox.addEventListener("change", function () {
+        const chk = document.createElement("input");
+        chk.type="checkbox";
+        chk.value=val;
+        if(activeFilters[filterType].includes(val)) chk.checked=true;
+        chk.addEventListener("change",function(){
           const allChk = ul.querySelector('input[value="all"]');
-          if (this.checked && allChk) allChk.checked = false;
-          updateActiveFilter(filterType, ul);
+          if(this.checked && allChk) allChk.checked = false;
+          updateActiveFilter(filterType,ul);
         });
-        const label = document.createElement("label");
-        label.appendChild(checkbox);
-        const spanOpt = document.createElement("span");
-        spanOpt.className = "option-text";
-        spanOpt.innerHTML = " " + val + ' <span class="count">' + (counts[val] || 0) + "</span>";
-        label.appendChild(spanOpt);
-        li.appendChild(label);
+        const lbl = document.createElement("label");
+        lbl.appendChild(chk);
+        const span = document.createElement("span");
+        span.innerHTML = " "+val+' <span class="count">'+(counts[val]||0)+'</span>';
+        lbl.appendChild(span);
+        li.appendChild(lbl);
         ul.appendChild(li);
       });
     }
 
-    function updateActiveFilter(filterType, ul) {
-      const checkboxes = ul.querySelectorAll('input[type="checkbox"]');
-      activeFilters[filterType] = [];
-      checkboxes.forEach(chk => {
-        if (chk.value !== "all" && chk.checked) {
-          activeFilters[filterType].push(chk.value);
-        }
+    function updateActiveFilter(filterType,ul){
+      const checked = [];
+      ul.querySelectorAll('input[type="checkbox"]').forEach(c=>{
+        if(c.value!=="all" && c.checked) checked.push(c.value);
       });
-      if (activeFilters[filterType].length === 0) {
+      activeFilters[filterType]=checked;
+      if(checked.length===0){
         const allChk = ul.querySelector('input[value="all"]');
-        if (allChk) allChk.checked = true;
+        if(allChk) allChk.checked=true;
       }
-      currentPage = 1;
-      renderCardsWithFilters(isShowingFavoritesOnly());
+      currentPage=1;
+      renderCardsWithFilters(showFavOnly);
     }
 
-    function setupCustomDropdown(filterType) {
-      const container = document.getElementById("list-" + filterType);
-      if (!container) return;
+    function setupCustomDropdown(filterType){
+      const container = document.getElementById("list-"+filterType);
+      if(!container) return;
       const anchor = container.querySelector(".anchor");
-      if (!anchor) return;
-      anchor.onclick = function () {
-        const all = document.querySelectorAll(".dropdown-check-list");
-        all.forEach(d => { if (d !== container) d.classList.remove("visible"); });
+      if(!anchor) return;
+      anchor.onclick = function(){
+        document.querySelectorAll(".dropdown-check-list").forEach(d=>{
+          if(d!==container) d.classList.remove("visible");
+        });
         container.classList.toggle("visible");
       };
     }
 
-    function createCardWrapper(uniqueId, anime, index) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "card-wrapper";
-      wrapper.id = uniqueId;
-      if (favorites.has(uniqueId)) wrapper.classList.add("favorite");
-
-      const card = document.createElement("div");
-      card.className = "anime-card";
-      card.id = "card-" + uniqueId;
-
-      const cardBg = document.createElement("div");
-      cardBg.className = "card-bg";
-      cardBg.style.backgroundImage = "url(" + (anime.Cover || "") + ")";
-      card.appendChild(cardBg);
-
-      const overlay = document.createElement("div");
-      overlay.className = "overlay";
-      card.appendChild(overlay);
-
-      const shadowTop = document.createElement("div");
-      shadowTop.className = "shadow-top";
-      card.appendChild(shadowTop);
-
-      const shadowBottom = document.createElement("div");
-      shadowBottom.className = "shadow-bottom";
-      card.appendChild(shadowBottom);
-
-      const topLogoDiv = document.createElement("div");
-      topLogoDiv.className = "card-header-logo";
-      const topLogoImg = document.createElement("img");
-      topLogoImg.src = "https://i.suar.me/OzJaa/l";
-      topLogoImg.alt = "Top Logo";
-      topLogoImg.crossOrigin = "anonymous";
-      topLogoDiv.appendChild(topLogoImg);
-      card.appendChild(topLogoDiv);
-
-      const topBar = document.createElement("div");
-      topBar.className = "card-top-bar";
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "anime-title";
-      titleDiv.textContent = anime.Title || "عنوان غير متوفر";
-
-      const ratingDiv = document.createElement("div");
-      ratingDiv.className = "rating-area";
-      const ratingIcon = document.createElement("img");
-      ratingIcon.src = "https://i.suar.me/8GKKn/l";
-      ratingIcon.alt = "Rating Icon";
-      ratingIcon.crossOrigin = "anonymous";
-      const ratingText = document.createElement("span");
-      ratingText.textContent = anime.Rating ? " " + anime.Rating : "MAL -";
-      ratingDiv.appendChild(ratingIcon);
-      ratingDiv.appendChild(ratingText);
-
-      topBar.appendChild(titleDiv);
-      topBar.appendChild(ratingDiv);
-      card.appendChild(topBar);
-
-      const contentDiv = document.createElement("div");
-      contentDiv.className = "card-content";
-
-      const posterDiv = document.createElement("div");
-      posterDiv.className = "poster-div";
-      const posterImg = document.createElement("img");
-      posterImg.className = "poster-img";
-      posterImg.src = anime.Cover || "";
-      posterImg.alt = "Anime Cover";
-      posterImg.crossOrigin = "anonymous";
-      posterDiv.appendChild(posterImg);
-      contentDiv.appendChild(posterDiv);
-
-      const infoDiv = document.createElement("div");
-      infoDiv.className = "info-boxes";
-
-      const row1 = document.createElement("div");
-      row1.className = "info-row";
-      const epBox = document.createElement("div");
-      epBox.className = "info-box";
-      epBox.innerHTML = "<strong>حلقات:</strong> <span>" + (anime.Episode || "-") + "</span>";
-      const airedBox = document.createElement("div");
-      airedBox.className = "info-box";
-      airedBox.innerHTML = "<strong>تاريخ:</strong> <span>" + (anime.Aired || "-") + "</span>";
-      row1.appendChild(epBox);
-      row1.appendChild(airedBox);
-
-      const row2 = document.createElement("div");
-      row2.className = "info-row";
-      const sourceBox = document.createElement("div");
-      sourceBox.className = "info-box";
-      sourceBox.innerHTML = "<strong>اقتباس:</strong> <span>" + (anime.Source || "-") + "</span>";
-      const studioBox = document.createElement("div");
-      studioBox.className = "info-box";
-      studioBox.innerHTML = "<strong>استديو:</strong> <span>" + (anime.Studio || "-") + "</span>";
-      row2.appendChild(sourceBox);
-      row2.appendChild(studioBox);
-
-      const row3 = document.createElement("div");
-      row3.className = "info-row";
-      const infoColumn = document.createElement("div");
-      infoColumn.className = "info-column";
-      const genreBox = document.createElement("div");
-      genreBox.className = "info-box-genre";
-      genreBox.innerHTML = "<strong>تصنيف:</strong> " + (anime.Genre || "-");
-      const themeBox = document.createElement("div");
-      themeBox.className = "info-box-genre";
-      themeBox.innerHTML = "<strong>ثيم:</strong> " + (anime.Theme || "-");
-      infoColumn.appendChild(genreBox);
-      infoColumn.appendChild(themeBox);
-      row3.appendChild(infoColumn);
-
-      infoDiv.appendChild(row1);
-      infoDiv.appendChild(row2);
-      infoDiv.appendChild(row3);
-
-      contentDiv.appendChild(infoDiv);
-      card.appendChild(contentDiv);
-
-      const storyDiv = document.createElement("div");
-      storyDiv.className = "story-box";
-      storyDiv.textContent = anime.Story || "";
-      card.appendChild(storyDiv);
-
-      const bottomLogoDiv = document.createElement("div");
-      bottomLogoDiv.className = "card-footer-logo";
-      const bottomLogoImg = document.createElement("img");
-      bottomLogoImg.src = "https://i.suar.me/evdMd/l";
-      bottomLogoImg.alt = "Bottom Logo";
-      bottomLogoImg.crossOrigin = "anonymous";
-      bottomLogoDiv.appendChild(bottomLogoImg);
-      card.appendChild(bottomLogoDiv);
-
-      if (topLikesMode && Array.isArray(topLikesList) && topLikesList.length) {
-        const rankIndex = topLikesList.indexOf(uniqueId);
-        if (rankIndex !== -1) {
-          const rankBadge = document.createElement("div");
-          rankBadge.className = "top-like-rank";
-          rankBadge.textContent = (rankIndex + 1).toString();
-          card.appendChild(rankBadge);
-        }
-      }
-
-      const buttonsDiv = createCardButtons(uniqueId, card.id);
-      wrapper.appendChild(card);
-      wrapper.appendChild(buttonsDiv);
-
-      return wrapper;
-    }
-
-    function setupLikeState(uniqueId, likeButton) {
-      const likeIcon = likeButton.querySelector(".like-icon");
+    // لايكات
+    function setupLikeState(uniqueId,likeButton){
+      const likeIcon  = likeButton.querySelector(".like-icon");
       const likeCountSpan = likeButton.querySelector(".like-count");
       loadLocalLikes();
       let baseCount = 0;
       let userHasLiked = false;
 
-      if (likesCollection) {
-        const likeDocRef = likesCollection.doc(uniqueId);
-        likeDocRef.get().then(doc => {
-          if (doc.exists) {
-            const data = doc.data() || {};
-            baseCount = typeof data.count === "number" ? data.count : 0;
-            if (currentUser && data.users && data.users[currentUser.uid]) {
-              userHasLiked = true;
-              likeIcon.style.color = "red";
-            }
-          }
-          if (!currentUser && localLikes && localLikes[uniqueId]) {
-            userHasLiked = true;
-            baseCount += 1;
-            likeIcon.style.color = "red";
-          }
-          likeButton.dataset.baseCount = baseCount;
-          likeButton.dataset.userHasLiked = userHasLiked ? "1" : "0";
-          likeCountSpan.textContent = baseCount;
-        }).catch(() => {
-          const localFlag = localLikes && localLikes[uniqueId];
-          likeButton.dataset.baseCount = localFlag ? 1 : 0;
-          likeButton.dataset.userHasLiked = localFlag ? "1" : "0";
-          likeCountSpan.textContent = localFlag ? 1 : 0;
-          if (localFlag) likeIcon.style.color = "red";
-        });
+      if(!likesCollection){
+        const localFlag = !!localLikes[uniqueId];
+        userHasLiked = localFlag;
+        baseCount = localFlag ? 1 : 0;
+        likeCountSpan.textContent = baseCount;
+        if(userHasLiked) likeIcon.style.color="red";
 
-        likeButton.addEventListener("click", () => {
-          const likeDocRef = likesCollection.doc(uniqueId);
-          const already = likeButton.dataset.userHasLiked === "1";
-
-          if (currentUser) {
-            likeDocRef.get().then(doc => {
-              let count = 0;
-              let users = {};
-              if (doc.exists) {
-                const data = doc.data() || {};
-                count = data.count || 0;
-                users = data.users || {};
-              }
-              if (already) {
-                if (users[currentUser.uid]) {
-                  delete users[currentUser.uid];
-                  count = Math.max(0, count - 1);
-                }
-                likeIcon.style.color = "#000";
-                likeButton.dataset.userHasLiked = "0";
-              } else {
-                if (!users[currentUser.uid]) {
-                  users[currentUser.uid] = true;
-                  count = count + 1;
-                }
-                likeIcon.style.color = "red";
-                likeButton.dataset.userHasLiked = "1";
-              }
-              likeDocRef.set({ count, users }, { merge: true }).then(() => {
-                likeButton.dataset.baseCount = String(count);
-                likeCountSpan.textContent = count;
-                loadLocalLikes();
-                if (localLikes && localLikes[uniqueId]) {
-                  delete localLikes[uniqueId];
-                  saveLocalLikes();
-                }
-              });
-            });
-          } else {
-            loadLocalLikes();
-            if (!localLikes) localLikes = {};
-            let base = parseInt(likeButton.dataset.baseCount || "0", 10);
-            if (already) {
-              delete localLikes[uniqueId];
-              likeIcon.style.color = "#000";
-              likeButton.dataset.userHasLiked = "0";
-              likeCountSpan.textContent = base;
-            } else {
-              localLikes[uniqueId] = true;
-              likeIcon.style.color = "red";
-              likeButton.dataset.userHasLiked = "1";
-              likeCountSpan.textContent = base + 1;
-            }
-            saveLocalLikes();
-          }
-        });
-      } else {
-        const flag = localLikes && localLikes[uniqueId];
-        likeButton.dataset.userHasLiked = flag ? "1" : "0";
-        likeButton.dataset.baseCount = flag ? "1" : "0";
-        likeCountSpan.textContent = flag ? "1" : "0";
-        if (flag) likeIcon.style.color = "red";
-
-        likeButton.addEventListener("click", () => {
-          loadLocalLikes();
-          if (!localLikes) localLikes = {};
-          const already = likeButton.dataset.userHasLiked === "1";
-          if (already) {
+        likeButton.addEventListener("click",()=>{
+          userHasLiked = !userHasLiked;
+          if(userHasLiked){
+            localLikes[uniqueId]=true;
+            baseCount=1;
+            likeIcon.style.color="red";
+          }else{
             delete localLikes[uniqueId];
-            likeIcon.style.color = "#000";
-            likeButton.dataset.userHasLiked = "0";
-            likeCountSpan.textContent = "0";
-          } else {
-            localLikes[uniqueId] = true;
-            likeIcon.style.color = "red";
-            likeButton.dataset.userHasLiked = "1";
-            likeCountSpan.textContent = "1";
+            baseCount=0;
+            likeIcon.style.color="#000";
           }
+          likeCountSpan.textContent = baseCount;
           saveLocalLikes();
         });
+        return;
       }
+
+      const guestId = getGuestId();
+      const likeDocRef = likesCollection.doc(uniqueId);
+
+      likeDocRef.get().then(doc=>{
+        let data = doc.exists ? (doc.data()||{}) : {};
+        let count = typeof data.count==="number" ? data.count : 0;
+        const users  = data.users  || {};
+        const guests = data.guests || {};
+
+        if(currentUser && users[currentUser.uid]){
+          userHasLiked = true;
+        }else if(!currentUser && guests[guestId]){
+          userHasLiked = true;
+        }else if(!currentUser && localLikes[uniqueId]){
+          // لايك قديم محلي فقط، لا نزيد العداد لكن نلوّن الزر
+          userHasLiked = true;
+        }
+        baseCount = count;
+        if(userHasLiked) likeIcon.style.color="red";
+        likeCountSpan.textContent = baseCount;
+        likeButton.dataset.userHasLiked = userHasLiked ? "1":"0";
+      }).catch(()=>{
+        const localFlag = !!localLikes[uniqueId];
+        userHasLiked = localFlag;
+        baseCount = localFlag ? 1:0;
+        likeCountSpan.textContent = baseCount;
+        if(userHasLiked) likeIcon.style.color="red";
+        likeButton.dataset.userHasLiked = userHasLiked ? "1":"0";
+      });
+
+      likeButton.addEventListener("click",()=>{
+        loadLocalLikes();
+        const already = likeButton.dataset.userHasLiked==="1";
+
+        likesCollection.doc(uniqueId).get().then(doc=>{
+          let data = doc.exists ? (doc.data()||{}) : {};
+          let count = typeof data.count==="number" ? data.count : 0;
+          const users  = data.users  || {};
+          const guests = data.guests || {};
+
+          if(currentUser){
+            if(already && users[currentUser.uid]){
+              delete users[currentUser.uid];
+              count = Math.max(0,count-1);
+              likeIcon.style.color="#000";
+              likeButton.dataset.userHasLiked="0";
+            }else if(!already && !users[currentUser.uid]){
+              users[currentUser.uid]=true;
+              count = count+1;
+              likeIcon.style.color="red";
+              likeButton.dataset.userHasLiked="1";
+            }
+          }else{
+            if(already && (guests[guestId] || localLikes[uniqueId])){
+              delete guests[guestId];
+              delete localLikes[uniqueId];
+              count = Math.max(0,count-1);
+              likeIcon.style.color="#000";
+              likeButton.dataset.userHasLiked="0";
+            }else if(!already){
+              guests[guestId]=true;
+              localLikes[uniqueId]=true;
+              count = count+1;
+              likeIcon.style.color="red";
+              likeButton.dataset.userHasLiked="1";
+            }
+          }
+
+          likeCountSpan.textContent = count;
+          localLikes[uniqueId] = likeButton.dataset.userHasLiked==="1";
+          saveLocalLikes();
+
+          likesCollection.doc(uniqueId).set({
+            count:count,
+            users:users,
+            guests:guests
+          },{merge:true}).catch(console.error);
+        }).catch(err=>{
+          console.error(err);
+        });
+      });
     }
 
-    function createCardButtons(uniqueId, cardId) {
+    function loadTopLikesList(callback){
+      if(!likesCollection){
+        loadLocalLikes();
+        callback(Object.keys(localLikes||{}));
+        return;
+      }
+      likesCollection.orderBy("count","desc").limit(50).get()
+        .then(snap=>{
+          const arr = [];
+          snap.forEach(doc=>{
+            if((doc.data()||{}).count>0) arr.push(doc.id);
+          });
+          if(arr.length===0){
+            loadLocalLikes();
+            callback(Object.keys(localLikes||{}));
+          }else{
+            callback(arr);
+          }
+        })
+        .catch(err=>{
+          console.error("loadTopLikesList",err);
+          loadLocalLikes();
+          callback(Object.keys(localLikes||{}));
+        });
+    }
+
+    // بناء الكرت
+    function createCardWrapper(uniqueId,anime,index){
+      const wrapper = document.createElement("div");
+      wrapper.className = "card-wrapper";
+      wrapper.id = uniqueId;
+      if(favorites.has(uniqueId)) wrapper.classList.add("favorite");
+
+      const card = document.createElement("div");
+      card.className = "anime-card";
+      card.id = "card-"+uniqueId;
+
+      const bg = document.createElement("div");
+      bg.className="card-bg";
+      bg.style.backgroundImage = "url("+(anime.Cover||"")+")";
+      card.appendChild(bg);
+
+      const overlay = document.createElement("div");
+      overlay.className="overlay";
+      card.appendChild(overlay);
+
+      const shTop = document.createElement("div");
+      shTop.className="shadow-top";
+      card.appendChild(shTop);
+      const shBot = document.createElement("div");
+      shBot.className="shadow-bottom";
+      card.appendChild(shBot);
+
+      const headLogo = document.createElement("div");
+      headLogo.className="card-header-logo";
+      const headImg = document.createElement("img");
+      headImg.src="https://i.suar.me/OzJaa/l";
+      headImg.alt="Logo";
+      headImg.crossOrigin="anonymous";
+      headLogo.appendChild(headImg);
+      card.appendChild(headLogo);
+
+      const topBar = document.createElement("div");
+      topBar.className="card-top-bar";
+      const titleDiv = document.createElement("div");
+      titleDiv.className="anime-title";
+      titleDiv.textContent = anime.Title || "عنوان غير متوفر";
+      const rateDiv = document.createElement("div");
+      rateDiv.className="rating-area";
+      const rateImg = document.createElement("img");
+      rateImg.src="https://i.suar.me/8GKKn/l";
+      rateImg.alt="MAL";
+      rateImg.crossOrigin="anonymous";
+      const rateText = document.createElement("span");
+      rateText.textContent = anime.Rating ? anime.Rating : "-";
+      rateDiv.appendChild(rateImg);
+      rateDiv.appendChild(rateText);
+      topBar.appendChild(titleDiv);
+      topBar.appendChild(rateDiv);
+      card.appendChild(topBar);
+
+      const content = document.createElement("div");
+      content.className="card-content";
+      const posterDiv = document.createElement("div");
+      posterDiv.className="poster-div";
+      const posterImg = document.createElement("img");
+      posterImg.className="poster-img";
+      posterImg.src = anime.Cover||"";
+      posterImg.alt="Poster";
+      posterImg.crossOrigin="anonymous";
+      posterDiv.appendChild(posterImg);
+      content.appendChild(posterDiv);
+
+      const infoDiv = document.createElement("div");
+      infoDiv.className="info-boxes";
+
+      const row1 = document.createElement("div");row1.className="info-row";
+      const epBox = document.createElement("div");epBox.className="info-box";
+      epBox.innerHTML = "<strong>حلقات:</strong> "+(anime.Episode||"-");
+      const airBox = document.createElement("div");airBox.className="info-box";
+      airBox.innerHTML = "<strong>تاريخ:</strong> "+(anime.Aired||"-");
+      row1.appendChild(epBox);row1.appendChild(airBox);
+
+      const row2 = document.createElement("div");row2.className="info-row";
+      const srcBox = document.createElement("div");srcBox.className="info-box";
+      srcBox.innerHTML = "<strong>اقتباس:</strong> "+(anime.Source||"-");
+      const stdBox = document.createElement("div");stdBox.className="info-box";
+      stdBox.innerHTML = "<strong>استديو:</strong> "+(anime.Studio||"-");
+      row2.appendChild(srcBox);row2.appendChild(stdBox);
+
+      const row3 = document.createElement("div");row3.className="info-row";
+      const col = document.createElement("div");col.className="info-column";
+      const genBox = document.createElement("div");genBox.className="info-box-genre";
+      genBox.innerHTML = "<strong>تصنيف:</strong> "+(anime.Genre||"-");
+      const thBox = document.createElement("div");thBox.className="info-box-genre";
+      thBox.innerHTML = "<strong>ثيم:</strong> "+(anime.Theme||"-");
+      col.appendChild(genBox);col.appendChild(thBox);
+      row3.appendChild(col);
+
+      infoDiv.appendChild(row1);
+      infoDiv.appendChild(row2);
+      infoDiv.appendChild(row3);
+      content.appendChild(infoDiv);
+      card.appendChild(content);
+
+      const storyDiv = document.createElement("div");
+      storyDiv.className="story-box";
+      storyDiv.textContent = anime.Story||"";
+      card.appendChild(storyDiv);
+
+      const footLogo = document.createElement("div");
+      footLogo.className="card-footer-logo";
+      const footImg = document.createElement("img");
+      footImg.src="https://i.suar.me/evdMd/l";
+      footImg.alt="logo";
+      footImg.crossOrigin="anonymous";
+      footLogo.appendChild(footImg);
+      card.appendChild(footLogo);
+
+      if(topLikesMode && Array.isArray(topLikesList) && topLikesList.length){
+        const rankIdx = topLikesList.indexOf(uniqueId);
+        if(rankIdx !== -1){
+          const badge = document.createElement("div");
+          badge.className="top-like-rank";
+          badge.textContent = (rankIdx+1).toString();
+          card.appendChild(badge);
+        }
+      }
+
+      const buttonsDiv = createCardButtons(uniqueId,card.id);
+      wrapper.appendChild(card);
+      wrapper.appendChild(buttonsDiv);
+      return wrapper;
+    }
+
+    function createCardButtons(uniqueId,cardId){
       const buttonsDiv = document.createElement("div");
-      buttonsDiv.className = "card-buttons";
+      buttonsDiv.className="card-buttons";
 
-      const favButton = document.createElement("button");
-      favButton.innerHTML = '<i class="fas fa-bookmark"></i> اضافة الى المفضلة';
-      favButton.className = "favorite-btn";
-      if (favorites.has(uniqueId)) favButton.classList.add("active");
-      favButton.addEventListener("click", function (e) {
+      const favBtn = document.createElement("button");
+      favBtn.className="favorite-btn";
+      favBtn.innerHTML = "<i class='fas fa-bookmark'></i> اضافة الى المفضلة";
+      if(favorites.has(uniqueId)) favBtn.classList.add("active");
+      favBtn.addEventListener("click",e=>{
         e.stopPropagation();
-        toggleFavorite(uniqueId, favButton);
+        toggleFavorite(uniqueId,favBtn);
       });
 
-      const shareButton = document.createElement("button");
-      shareButton.innerHTML = '<i class="fas fa-share-alt"></i> مشاركة';
-      shareButton.className = "share-btn";
-      if (sharedCards.has(uniqueId)) shareButton.classList.add("active-share");
-      shareButton.addEventListener("click", function (e) {
+      const shareBtn = document.createElement("button");
+      shareBtn.className="share-btn";
+      shareBtn.innerHTML="<i class='fas fa-share-alt'></i> مشاركة";
+      shareBtn.addEventListener("click",e=>{
         e.stopPropagation();
-        shareCard(cardId, uniqueId, shareButton);
+        shareCard(cardId,uniqueId,shareBtn);
       });
 
-      const downloadButton = document.createElement("button");
-      downloadButton.innerHTML = '<i class="fas fa-download"></i> تنزيل كصورة';
-      downloadButton.className = "download-btn";
-      if (downloadedCards.has(uniqueId)) downloadButton.classList.add("active-download");
-      downloadButton.addEventListener("click", function (e) {
+      const dlBtn = document.createElement("button");
+      dlBtn.className="download-btn";
+      dlBtn.innerHTML="<i class='fas fa-download'></i> تنزيل كصورة";
+      dlBtn.addEventListener("click",e=>{
         e.stopPropagation();
-        downloadCard(cardId, uniqueId, downloadButton);
+        downloadCard(cardId,uniqueId,dlBtn);
       });
 
-      const likeButton = document.createElement("button");
-      likeButton.className = "like-btn";
-      likeButton.innerHTML = '<i class="fa-solid fa-heart like-icon"></i> <span class="like-count">0</span>';
-      likeButton.style.padding = "3px 8px";
-      likeButton.style.borderRadius = "0";
-      likeButton.style.cursor = "pointer";
-      likeButton.style.background = "#FFF7D1";
-      likeButton.style.border = "1px solid #000";
-      likeButton.style.boxShadow = "2px 2px 0 #000";
-      likeButton.style.fontSize = "11px";
+      const likeBtn = document.createElement("button");
+      likeBtn.className="like-btn";
+      likeBtn.innerHTML = "<i class='fa-solid fa-heart like-icon'></i> <span class='like-count'>0</span>";
+      setupLikeState(uniqueId,likeBtn);
 
-      setupLikeState(uniqueId, likeButton);
-
-      buttonsDiv.appendChild(favButton);
-      buttonsDiv.appendChild(shareButton);
-      buttonsDiv.appendChild(downloadButton);
-      buttonsDiv.appendChild(likeButton);
-
+      buttonsDiv.appendChild(favBtn);
+      buttonsDiv.appendChild(shareBtn);
+      buttonsDiv.appendChild(dlBtn);
+      buttonsDiv.appendChild(likeBtn);
       return buttonsDiv;
     }
 
-    function toggleFavorite(uniqueId, favBtn) {
-      const wrapper = document.getElementById(uniqueId);
-      if (favorites.has(uniqueId)) {
+    // مفضلة
+    function toggleFavorite(uniqueId,btn){
+      const wrap = document.getElementById(uniqueId);
+      if(favorites.has(uniqueId)){
         favorites.delete(uniqueId);
-        favBtn.classList.remove("active");
-        if (wrapper) wrapper.classList.remove("favorite");
-      } else {
+        btn.classList.remove("active");
+        if(wrap) wrap.classList.remove("favorite");
+      }else{
         favorites.add(uniqueId);
-        favBtn.classList.add("active");
-        if (wrapper) wrapper.classList.add("favorite");
+        btn.classList.add("active");
+        if(wrap) wrap.classList.add("favorite");
       }
       saveFavoritesLocal();
-      if (currentUser) saveFavoritesToServer();
+      if(currentUser) saveFavoritesToServer();
       updateFavoritesCount();
     }
 
-    function shareCard(cardId, uniqueId, buttonEl) {
+    // مشاركة / تحميل
+    function shareCard(cardId,uniqueId,btn){
       const card = document.getElementById(cardId);
-      if (!card) return;
+      if(!card) return;
       const original = card.style.transform;
-      card.style.transform = "none";
-      html2canvas(card, { useCORS: true, scale: 4, imageSmoothingEnabled: false }).then(canvas => {
-        card.style.transform = original;
-        const link = document.createElement("a");
-        link.download = "card.png";
-        link.href = canvas.toDataURL();
-        link.click();
-        sharedCards.add(uniqueId);
-        if (buttonEl) buttonEl.classList.add("active-share");
+      card.style.transform="none";
+      html2canvas(card,{useCORS:true,scale:3,imageSmoothingEnabled:false}).then(canvas=>{
+        card.style.transform=original;
+        canvas.toBlob(blob=>{
+          if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],"anime-card.png",{type:"image/png"})]})){
+            const file = new File([blob],"anime-card.png",{type:"image/png"});
+            navigator.share({files:[file],title:"بطاقة أنمي"}).catch(()=>{});
+          }else{
+            const link = document.createElement("a");
+            link.download="card.png";
+            link.href=canvas.toDataURL();
+            link.click();
+          }
+          btn.classList.add("active-share");
+        });
       });
     }
-
-    function downloadCard(cardId, uniqueId, buttonEl) {
+    function downloadCard(cardId,uniqueId,btn){
       const card = document.getElementById(cardId);
-      if (!card) return;
+      if(!card) return;
       const original = card.style.transform;
-      card.style.transform = "none";
-      html2canvas(card, { useCORS: true, scale: 4, imageSmoothingEnabled: false }).then(canvas => {
-        card.style.transform = original;
-        let fileName = "card";
+      card.style.transform="none";
+      html2canvas(card,{useCORS:true,scale:3,imageSmoothingEnabled:false}).then(canvas=>{
+        card.style.transform=original;
         const titleEl = card.querySelector(".anime-title");
-        if (titleEl && titleEl.textContent) {
-          fileName = titleEl.textContent.trim().replace(/[/\\?%*:|"<>]/g, "_");
-        }
+        let name = "card";
+        if(titleEl && titleEl.textContent) name = titleEl.textContent.trim().replace(/[\\/:*?"<>|]/g,"_");
         const link = document.createElement("a");
-        link.download = fileName + ".png";
+        link.download = name+".png";
         link.href = canvas.toDataURL();
         link.click();
-        downloadedCards.add(uniqueId);
-        if (buttonEl) buttonEl.classList.add("active-download");
+        btn.classList.add("active-download");
       });
     }
 
-    function renderCardsWithFilters(showFavOnly) {
-      const dataContainer = document.getElementById("data-container");
-      if (!dataContainer) return;
-      const container = document.createElement("div");
-      container.className = "cards-container";
+    // عرض الكروت
+    function renderPagination(totalItems){
+      const top = document.getElementById("pagination");
+      const bot = document.getElementById("pagination-bottom");
+      if(top) top.innerHTML="";
+      if(bot) bot.innerHTML="";
+      const totalPages = Math.max(1,Math.ceil(totalItems/pageSize));
+      if(totalPages<=1) return;
 
-      const filtered = getFilteredAnime(showFavOnly);
+      function makeBtn(i){
+        const b=document.createElement("button");
+        b.textContent=i;
+        if(i===currentPage) b.classList.add("active-page");
+        b.addEventListener("click",()=>{
+          currentPage=i;
+          renderCardsWithFilters(showFavOnly);
+          window.scrollTo({top:0,behavior:"smooth"});
+        });
+        return b;
+      }
+      for(let i=1;i<=totalPages;i++){
+        const b1=makeBtn(i);
+        const b2=makeBtn(i);
+        top.appendChild(b1);
+        bot.appendChild(b2);
+      }
+    }
+
+    function renderCardsWithFilters(showFav){
+      const containerOuter = document.getElementById("data-container");
+      if(!containerOuter) return;
+      const cardsDiv = document.createElement("div");
+      cardsDiv.className="cards-container";
+
+      const filtered = getFilteredAnime(showFav);
       const totalItems = filtered.length;
-      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-      if (currentPage > totalPages) currentPage = totalPages;
+      const totalPages = Math.max(1,Math.ceil(totalItems/pageSize));
+      if(currentPage>totalPages) currentPage=totalPages;
 
-      const startIndex = (currentPage - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      const pageItems = filtered.slice(startIndex, endIndex);
+      const start = (currentPage-1)*pageSize;
+      const end   = start+pageSize;
+      const pageItems = filtered.slice(start,end);
 
-      pageItems.forEach((item, index) => {
-        const wrapper = createCardWrapper(item.uniqueId, item.anime, index);
-        container.appendChild(wrapper);
+      pageItems.forEach((item,idx)=>{
+        const w = createCardWrapper(item.uniqueId,item.anime,idx);
+        cardsDiv.appendChild(w);
       });
 
-      dataContainer.innerHTML = "";
-      dataContainer.appendChild(container);
+      containerOuter.innerHTML="";
+      containerOuter.appendChild(cardsDiv);
       renderPagination(totalItems);
 
-      // إعادة بناء قيم الفلاتر (حسب النتيجة الحالية)
+      // تحديث قيم الفلاتر بعد كل عرض
       ["Episode","Source","Studio","Aired","Genre","Theme"].forEach(populateCustomDropdown);
     }
 
-    function toggleFavorites() {
-      showFavoritesOnly = !showFavoritesOnly;
-      currentPage = 1;
-      updateFavoritesCount();
-      renderCardsWithFilters(showFavoritesOnly);
+    // توب لايكس
+    function toggleTopLikesMode(){
+      const btn = document.getElementById("topLikesFilterBtn");
+      if(!btn) return;
+      if(topLikesMode){
+        topLikesMode=false;
+        topLikesList=[];
+        btn.classList.remove("active-toplikes");
+        currentPage=1;
+        renderCardsWithFilters(showFavOnly);
+        return;
+      }
+      loadTopLikesList(list=>{
+        topLikesList=list;
+        topLikesMode=true;
+        btn.classList.add("active-toplikes");
+        currentPage=1;
+        renderCardsWithFilters(showFavOnly);
+      });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const favBtn = document.getElementById("favoritesToggle");
-      const searchInput = document.getElementById("searchBox");
+    // تفعيل الصفحة
+    document.addEventListener("DOMContentLoaded",function(){
+      const favBtn   = document.getElementById("favoritesToggle");
+      const searchEl = document.getElementById("searchBox");
       const topLikesBtn = document.getElementById("topLikesFilterBtn");
+      const loginBtn = document.getElementById("loginSyncBtn");
+      const loader   = document.getElementById("loader");
+      const dataCont = document.getElementById("data-container");
+      const progress = document.getElementById("progressBar");
       const backToTop = document.getElementById("backToTop");
-      const loader = document.getElementById("loader");
-      const progressBar = document.getElementById("progressBar");
-      const dataContainer = document.getElementById("data-container");
 
       loadFavoritesLocal();
       loadLocalLikes();
       updateFavoritesCount();
 
-      ["Episode","Source","Studio","Aired","Genre","Theme"].forEach(ft => {
-        setupCustomDropdown(ft);
-      });
+      ["Episode","Source","Studio","Aired","Genre","Theme"].forEach(setupCustomDropdown);
 
-      if (favBtn) {
-        favBtn.addEventListener("click", toggleFavorites);
-      }
-      if (searchInput) {
-        searchInput.addEventListener("input", function () {
-          currentPage = 1;
-          renderCardsWithFilters(isShowingFavoritesOnly());
+      if(favBtn){
+        favBtn.addEventListener("click",()=>{
+          showFavOnly = !showFavOnly;
+          updateFavoritesCount();
+          currentPage=1;
+          renderCardsWithFilters(showFavOnly);
         });
       }
-      if (topLikesBtn) {
-        topLikesBtn.addEventListener("click", toggleTopLikesMode);
+      if(searchEl){
+        searchEl.addEventListener("input",()=>{
+          currentPage=1;
+          renderCardsWithFilters(showFavOnly);
+        });
+      }
+      if(topLikesBtn){
+        topLikesBtn.addEventListener("click",toggleTopLikesMode);
       }
 
-      window.addEventListener("scroll", function () {
-        if (window.scrollY > 300) {
-          backToTop.style.display = "flex";
-        } else {
-          backToTop.style.display = "none";
+      window.addEventListener("scroll",()=>{
+        if(window.scrollY>300) backToTop.style.display="flex";
+        else backToTop.style.display="none";
+      });
+      backToTop.addEventListener("click",()=>{
+        window.scrollTo({top:0,behavior:"smooth"});
+      });
+
+      // Auth
+      if(loginBtn){
+        if(location.protocol==="file:"){
+          loginBtn.addEventListener("click",function(){
+            alert("تسجيل الدخول بقوقل لا يعمل من ملف محلي، ارفع الصفحة على موقع http/https.");
+          });
+        }else{
+          const provider = new firebase.auth.GoogleAuthProvider();
+          auth.onAuthStateChanged(user=>{
+            currentUser=user;
+            if(user){
+              loginBtn.innerHTML="تسجيل خروج <i class='fa-brands fa-google'></i>";
+              mergeFavoritesWithServer();
+            }else{
+              loginBtn.innerHTML="<i class='fa-brands fa-google'></i> سجل لحفظ مفضلتك";
+              loadFavoritesLocal();
+              updateFavoritesCount();
+              renderCardsWithFilters(showFavOnly);
+            }
+          });
+          loginBtn.addEventListener("click",()=>{
+            if(!currentUser){
+              auth.signInWithPopup(provider).catch(err=>console.log("Auth error:",err));
+            }else{
+              auth.signOut().catch(err=>console.log("Signout error:",err));
+            }
+          });
         }
-      });
-      backToTop.addEventListener("click", function () {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      // Firebase Auth زر تسجيل الدخول
-      const loginBtnEl = document.getElementById("loginSyncBtn");
-      if (auth && loginBtnEl) {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.onAuthStateChanged(user => {
-          currentUser = user;
-          if (user) {
-            loginBtnEl.innerHTML = 'تسجيل خروج <span class="fa-brands fa-google"></span>';
-            mergeFavoritesWithServer();
-          } else {
-            loginBtnEl.innerHTML = 'سجّل لحفظ مفضلتك <span class="fa-brands fa-google"></span>';
-            currentUser = null;
-            loadFavoritesLocal();
-            updateFavoritesCount();
-            renderCardsWithFilters(isShowingFavoritesOnly());
-          }
-        });
-        loginBtnEl.addEventListener("click", () => {
-          if (!currentUser) {
-            auth.signInWithPopup(provider).catch(err => console.log("Auth error:", err));
-          } else {
-            auth.signOut().catch(err => console.log("Signout error:", err));
-          }
-        });
-      } else if (loginBtnEl) {
-        loginBtnEl.style.display = "none";
       }
 
-      // عرض اللودر بشكل بسيط
-      if (progressBar) {
-        progressBar.style.width = "30%";
-        setTimeout(() => { progressBar.style.width = "70%"; }, 200);
-        setTimeout(() => {
-          progressBar.style.width = "100%";
-          if (loader) loader.style.display = "none";
-          if (dataContainer) dataContainer.style.display = "block";
+      if(progress){
+        progress.style.width="40%";
+        setTimeout(()=>{progress.style.width="80%";},250);
+        setTimeout(()=>{
+          progress.style.width="100%";
+          if(loader) loader.style.display="none";
+          if(dataCont) dataCont.style.display="block";
           renderCardsWithFilters(false);
-        }, 500);
-      } else {
-        if (loader) loader.style.display = "none";
-        if (dataContainer) dataContainer.style.display = "block";
+        },600);
+      }else{
+        if(loader) loader.style.display="none";
+        if(dataCont) dataCont.style.display="block";
         renderCardsWithFilters(false);
       }
     });
